@@ -34,7 +34,12 @@ npm run typecheck # TypeScript
 | `src/db` | SQLite-Schema und Abfragen |
 | `src/lib` | Reine Logik: Nährwerte, Barcodes, Open Food Facts, Formatierung |
 | `src/components` | UI-Bausteine |
+| `src/legal` | Impressum, rechtliche Links, generierte Lizenzliste |
 | `tests` | Tests mit dem eingebauten Node-Testrunner |
+| `scripts` | `npm run icons` (Icons aus `assets/source/icon.svg`), `npm run licenses` (Lizenzliste) |
+| `docs` | Datenschutz, Impressum, Support (GitHub Pages) und die App-Store-Connect-Checkliste |
+
+Nach dem Hinzufügen oder Aktualisieren von Paketen `npm run licenses` ausführen, damit die Liste unter *Info & Rechtliches* aktuell bleibt.
 
 ## Veröffentlichen
 
