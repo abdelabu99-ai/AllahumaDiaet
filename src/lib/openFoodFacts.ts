@@ -109,7 +109,7 @@ export function parseProduct(barcode: string, raw: RawProduct): LookupResult {
   };
 }
 
-/** Open Food Facts bittet um einen eindeutigen User-Agent mit Kontaktmöglichkeit, z. B. `HALABI/1.0.0 (mail@example.com)`. */
+/** Open Food Facts verlangt einen eindeutigen User-Agent im Format `AppName/Version (Kontakt-E-Mail)`. */
 export function buildUserAgent(appName: string, appVersion: string, contactEmail: string): string {
   return `${appName}/${appVersion} (${contactEmail})`;
 }

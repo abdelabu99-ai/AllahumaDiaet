@@ -70,8 +70,8 @@ export default function About() {
       <Section title="Datenschutz">
         <Text style={styles.body}>
           Alle Angaben bleiben ausschließlich auf deinem Gerät, es gibt kein Konto und keine Werbung. Die Kamera wird nur zum
-          Scannen von Barcodes genutzt. Beim Scannen werden der Barcode und deine IP-Adresse an Open Food Facts übermittelt, um
-          das Produkt zu finden.
+          Scannen von Barcodes genutzt. Beim Scannen und bei der Online-Suche werden der Barcode bzw. dein Suchbegriff und deine
+          IP-Adresse an Open Food Facts übermittelt, um das Produkt zu finden.
         </Text>
         <PrimaryButton
           label="Datenschutzerklärung öffnen"

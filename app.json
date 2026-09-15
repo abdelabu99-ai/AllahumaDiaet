@@ -8,7 +8,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "de.abuelkheir.halabi",
+      "bundleIdentifier": "com.abdelkarim.allahumadiaet",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
@@ -38,7 +38,7 @@
       }
     },
     "android": {
-      "package": "de.abuelkheir.halabi",
+      "package": "com.abdelkarim.allahumadiaet",
       "adaptiveIcon": {
         "backgroundColor": "#16A34A",
         "foregroundImage": "./assets/android-icon-foreground.png",
