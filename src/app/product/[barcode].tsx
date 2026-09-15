@@ -21,8 +21,8 @@ import { Chip } from '../../components/Chip';
 import { Icon } from '../../components/Icon';
 import { LabeledInput } from '../../components/LabeledInput';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { addLogEntry, getFoodItem, saveFoodItem, type FoodItem } from '../../db/repository';
-import { normalizeBarcode } from '../../lib/barcode';
+import { addLogEntry, foodPer100g, getFoodItem, saveFoodItem, type FoodItem, type NewFoodItem } from '../../db/repository';
+import { isCustomFoodKey, parseFoodKey } from '../../lib/foodKey';
 import { defaultMealType, formatDecimal, formatInt, MEAL_TYPES, parseDecimal, toInputText, type MealType } from '../../lib/format';
 import { nutrientsForPortion } from '../../lib/nutrition';
 import { fetchProduct, type PartialProduct } from '../../lib/openFoodFacts';
@@ -32,44 +32,54 @@ type ScreenState =
   | { kind: 'loading' }
   | { kind: 'invalid' }
   | { kind: 'ready'; food: FoodItem }
-  | { kind: 'manual'; reason: 'not_found' | 'incomplete' | 'error'; prefill: PartialProduct | null };
+  | { kind: 'manual'; reason: 'not_found' | 'incomplete' | 'error' | 'custom'; prefill: PartialProduct | null };
 
 const MAX_PORTION_G = 5000;
+
+const asUnsaved = (item: NewFoodItem): FoodItem => ({ ...item, userEdited: false, updatedAt: null });
 
 export default function ProductScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ barcode: string }>();
-  const barcode = normalizeBarcode(String(params.barcode ?? ''));
+  // `barcode` ist eine GTIN oder ein `custom:`-Schlüssel; `name` füllt ein neues eigenes Lebensmittel vor.
+  const params = useLocalSearchParams<{ barcode: string; name?: string }>();
+  const foodKey = parseFoodKey(String(params.barcode ?? ''));
+  const initialName = typeof params.name === 'string' ? params.name : '';
 
   const [state, setState] = useState<ScreenState>({ kind: 'loading' });
 
   const lookup = useCallback(async () => {
-    if (!barcode) {
+    if (!foodKey) {
       setState({ kind: 'invalid' });
       return;
     }
     setState({ kind: 'loading' });
 
     // Zuerst lokal: schnell und funktioniert auch ohne Internet im Supermarkt.
-    const local = await getFoodItem(db, barcode);
+    const local = await getFoodItem(db, foodKey);
     if (local) {
       setState({ kind: 'ready', food: local });
       return;
     }
 
-    const result = await fetchProduct(barcode, USER_AGENT);
+    if (isCustomFoodKey(foodKey)) {
+      const prefill = { barcode: foodKey, name: initialName, brand: '', servingSizeG: null, imageUrl: null };
+      setState({ kind: 'manual', reason: 'custom', prefill });
+      return;
+    }
+
+    const result = await fetchProduct(foodKey, USER_AGENT);
     if (result.status === 'found') {
-      const food: FoodItem = { ...result.product, source: 'openfoodfacts' };
+      const food: NewFoodItem = { ...result.product, source: 'openfoodfacts' };
       await saveFoodItem(db, food);
-      setState({ kind: 'ready', food });
+      setState({ kind: 'ready', food: asUnsaved(food) });
     } else if (result.status === 'incomplete') {
       setState({ kind: 'manual', reason: 'incomplete', prefill: result.partial });
     } else {
       setState({ kind: 'manual', reason: result.status, prefill: null });
     }
-  }, [db, barcode]);
+  }, [db, foodKey, initialName]);
 
   useEffect(() => {
     lookup();
@@ -101,9 +111,9 @@ export default function ProductScreen() {
         </View>
       )}
 
-      {state.kind === 'manual' && barcode && (
+      {state.kind === 'manual' && foodKey && (
         <ManualEntryForm
-          barcode={barcode}
+          barcode={foodKey}
           reason={state.reason}
           prefill={state.prefill}
           onRetry={lookup}
@@ -133,10 +143,7 @@ function PortionForm({ food, onSaved }: { food: FoodItem; onSaved: () => void })
 
   const grams = parseDecimal(amount);
   const validGrams = grams !== null && grams > 0 && grams <= MAX_PORTION_G ? grams : null;
-  const portion = nutrientsForPortion(
-    { calories: food.caloriesPer100g, protein: food.proteinPer100g, carbs: food.carbsPer100g, fat: food.fatPer100g },
-    validGrams ?? 0,
-  );
+  const portion = nutrientsForPortion(foodPer100g(food), validGrams ?? 0);
 
   const presets: { label: string; grams: number }[] = [
     ...(food.servingSizeG ? [{ label: `1 Packung (${formatDecimal(food.servingSizeG)} g)`, grams: food.servingSizeG }] : []),
@@ -149,7 +156,7 @@ function PortionForm({ food, onSaved }: { food: FoodItem; onSaved: () => void })
     if (validGrams === null) return;
     setSaving(true);
     try {
-      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType });
+      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType, per100g: foodPer100g(food) });
       onSaved();
     } finally {
       setSaving(false);
@@ -232,6 +239,7 @@ const REASON_TEXT = {
   not_found: 'Dieses Produkt ist noch nicht in der Datenbank. Gib die Nährwerte einmalig ein – beim nächsten Scan sind sie sofort da.',
   incomplete: 'Für dieses Produkt fehlen Nährwerte. Bitte ergänze sie einmalig von der Verpackung.',
   error: 'Keine Verbindung zur Produktdatenbank. Du kannst es erneut versuchen oder die Nährwerte von der Verpackung eintippen.',
+  custom: 'Lege ein eigenes Lebensmittel ohne Barcode an. Es wird auf deinem Gerät gespeichert und ist über die Suche wieder auffindbar.',
 } as const;
 
 type ManualProps = {
@@ -280,7 +288,7 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
     if (!canSave || kcalValue === null || proteinValue === null || carbsValue === null || fatValue === null) return;
     setSaving(true);
     try {
-      const food: FoodItem = {
+      const food: NewFoodItem = {
         barcode,
         name: name.trim(),
         brand: brand.trim(),
@@ -293,7 +301,7 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
         source: 'manual',
       };
       await saveFoodItem(db, food);
-      onSaved(food);
+      onSaved(asUnsaved(food));
     } finally {
       setSaving(false);
     }
@@ -306,7 +314,7 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
         {reason === 'error' && (
           <PrimaryButton label="Erneut versuchen" variant="secondary" onPress={onRetry} style={{ marginBottom: spacing.md }} />
         )}
-        <Text style={styles.barcode}>Barcode {barcode}</Text>
+        {!isCustomFoodKey(barcode) && <Text style={styles.barcode}>Barcode {barcode}</Text>}
 
         <LabeledInput label="Produktname" keyboardType="default" value={name} onChangeText={setName} placeholder="z. B. Magerquark" autoFocus={!prefill?.name} />
         <LabeledInput label="Marke (optional)" keyboardType="default" value={brand} onChangeText={setBrand} />
