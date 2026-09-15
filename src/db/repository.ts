@@ -249,6 +249,26 @@ export async function updateFoodNutrients(
   );
 }
 
+/** Ersetzt eigene Werte wieder durch die Daten von Open Food Facts und hebt die Korrektur-Markierung auf. */
+export async function restoreFoodFromOpenFoodFacts(db: SQLiteDatabase, product: ProductData): Promise<void> {
+  await db.runAsync(
+    `UPDATE food_item SET
+       name = ?, brand = ?, calories_per_100g = ?, protein_per_100g = ?, carbs_per_100g = ?, fat_per_100g = ?,
+       serving_size_g = ?, image_url = ?, source = 'openfoodfacts', user_edited = 0, updated_at = ?
+     WHERE barcode = ?`,
+    product.name,
+    product.brand,
+    product.caloriesPer100g,
+    product.proteinPer100g,
+    product.carbsPer100g,
+    product.fatPer100g,
+    product.servingSizeG,
+    product.imageUrl,
+    new Date().toISOString(),
+    product.barcode,
+  );
+}
+
 /** Lokale Suche nach Name oder Marke, Groß-/Kleinschreibung egal, Treffer am Wortanfang zuerst. */
 export async function searchLocalFoods(db: SQLiteDatabase, query: string, limit: number): Promise<FoodItem[]> {
   const pattern = toLikePattern(query);
