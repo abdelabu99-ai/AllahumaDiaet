@@ -84,7 +84,7 @@ export default function Dashboard() {
           </View>
           <View style={styles.macros}>
             <MacroBar label="Protein" consumed={totals.protein} goal={macroGoals.protein} color={colors.protein} />
-            <MacroBar label="Kohlenh."consumed={totals.carbs} goal={macroGoals.carbs} color={colors.carbs} />
+            <MacroBar label="Kohlenh." consumed={totals.carbs} goal={macroGoals.carbs} color={colors.carbs} />
             <MacroBar label="Fett" consumed={totals.fat} goal={macroGoals.fat} color={colors.fat} />
           </View>
         </View>
@@ -117,9 +117,12 @@ export default function Dashboard() {
                   mealEntries.map((entry) => (
                     <Pressable
                       key={entry.id}
+                      onPress={() => router.push({ pathname: '/entry/[id]', params: { id: entry.id } })}
                       onLongPress={() => confirmDelete(entry)}
                       style={({ pressed }) => [styles.entry, pressed && { opacity: 0.6 }]}
-                      accessibilityHint="Lange drücken zum Löschen"
+                      accessibilityRole="button"
+                      accessibilityLabel={`${entry.name}, ${formatDecimal(entry.grams)} Gramm, ${formatInt(entry.totals.calories)} Kilokalorien`}
+                      accessibilityHint="Tippen zum Bearbeiten, lange drücken zum Löschen"
                     >
                       <Text style={styles.entryTime}>{formatTime(entry.timestamp)}</Text>
                       <View style={styles.entryMain}>
@@ -138,7 +141,7 @@ export default function Dashboard() {
           })
         )}
 
-        {entries.length > 0 && <Text style={styles.hint}>Zum Löschen einen Eintrag lange drücken.</Text>}
+        {entries.length > 0 && <Text style={styles.hint}>Tippen zum Bearbeiten</Text>}
         <Text style={styles.attribution}>Daten & Bilder: Open Food Facts (ODbL, CC BY-SA)</Text>
         <Pressable onPress={() => router.push('/about')} hitSlop={8} style={styles.aboutLink} accessibilityRole="link">
           <Text style={styles.aboutLinkText}>Info & Rechtliches</Text>

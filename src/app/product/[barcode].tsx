@@ -37,6 +37,7 @@ import { isCustomFoodKey, parseFoodKey } from '../../lib/foodKey';
 import { defaultMealType, formatDecimal, formatInt, MEAL_TYPES, parseDecimal, toInputText, type MealType } from '../../lib/format';
 import { nutrientsForPortion } from '../../lib/nutrition';
 import { fetchProduct, type PartialProduct } from '../../lib/openFoodFacts';
+import { portionPresets, validPortionGrams } from '../../lib/portions';
 import { colors, radius, spacing } from '../../theme';
 
 type ScreenState =
@@ -45,8 +46,6 @@ type ScreenState =
   /** `persisted: false` = Daten von Open Food Facts, noch nicht in food_item gespeichert. */
   | { kind: 'ready'; food: FoodItem; persisted: boolean }
   | { kind: 'manual'; reason: 'not_found' | 'incomplete' | 'error' | 'custom'; prefill: PartialProduct | null };
-
-const MAX_PORTION_G = 5000;
 
 const asUnsaved = (item: NewFoodItem): FoodItem => ({ ...item, userEdited: false, updatedAt: null });
 
@@ -164,17 +163,11 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
   const [restoring, setRestoring] = useState(false);
 
   const grams = parseDecimal(amount);
-  const validGrams = grams !== null && grams > 0 && grams <= MAX_PORTION_G ? grams : null;
+  const validGrams = validPortionGrams(grams);
   const per100g = foodPer100g(food);
   const portion = nutrientsForPortion(per100g, validGrams ?? 0);
   const canRestore = food.userEdited && !isCustomFoodKey(food.barcode);
-
-  const presets: { label: string; grams: number }[] = [
-    ...(food.servingSizeG ? [{ label: `1 Packung (${formatDecimal(food.servingSizeG)} g)`, grams: food.servingSizeG }] : []),
-    { label: '100 g', grams: 100 },
-    { label: '1 Esslöffel (15 g)', grams: 15 },
-    { label: '1 Teelöffel (5 g)', grams: 5 },
-  ];
+  const presets = portionPresets(food.servingSizeG);
 
   const save = async () => {
     if (validGrams === null) return;

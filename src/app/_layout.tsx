@@ -3,7 +3,7 @@ import { SQLiteProvider } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
 
 import { DATABASE_NAME, migrateDbIfNeeded } from '../db/schema';
-import { colors } from '../theme';
+import { colors, radius } from '../theme';
 
 export default function RootLayout() {
   return (
@@ -24,6 +24,17 @@ export default function RootLayout() {
         <Stack.Screen name="scan" options={{ presentation: 'fullScreenModal', headerShown: false, animation: 'fade' }} />
         {/* Eigene Kopfzeile, damit die Tastatur den Speichern-Button nicht verdeckt. */}
         <Stack.Screen name="product/[barcode]" options={{ headerShown: false }} />
+        {/* Feste Höhe statt 'fitToContents': Der Inhalt scrollt und nutzt flex: 1. */}
+        <Stack.Screen
+          name="entry/[id]"
+          options={{
+            presentation: 'formSheet',
+            headerShown: false,
+            sheetAllowedDetents: [0.92],
+            sheetGrabberVisible: true,
+            sheetCornerRadius: radius.lg,
+          }}
+        />
       </Stack>
     </SQLiteProvider>
   );
