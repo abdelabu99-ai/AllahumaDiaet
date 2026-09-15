@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
-    "expo": "~57.0.22",
+    "expo": "~57.0.23",
     "expo-camera": "~57.0.5",
     "expo-constants": "~57.0.18",
     "expo-crypto": "~57.0.3",
+    "expo-dev-client": "~57.0.19",
     "expo-haptics": "~57.0.3",
     "expo-linking": "~57.0.10",
     "expo-router": "~57.0.21",
+    "expo-splash-screen": "~57.0.9",
     "expo-sqlite": "~57.0.3",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "sharp": "^0.35.4",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -27,7 +30,14 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tests",
+    "icons": "node scripts/generate-icons.mjs",
+    "licenses": "node scripts/generate-licenses.mjs",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"tests/**/*.test.ts\""
+  },
+  "overrides": {
+    "react-dom": "19.2.3",
+    "react-native-reanimated": "4.5.1",
+    "react-native-worklets": "0.10.1"
   },
   "private": true
 }

@@ -139,7 +139,10 @@ export default function Dashboard() {
         )}
 
         {entries.length > 0 && <Text style={styles.hint}>Zum Löschen einen Eintrag lange drücken.</Text>}
-        <Text style={styles.attribution}>Produktdaten: Open Food Facts (ODbL)</Text>
+        <Text style={styles.attribution}>Daten & Bilder: Open Food Facts (ODbL, CC BY-SA)</Text>
+        <Pressable onPress={() => router.push('/about')} hitSlop={8} style={styles.aboutLink} accessibilityRole="link">
+          <Text style={styles.aboutLinkText}>Info & Rechtliches</Text>
+        </Pressable>
       </ScrollView>
 
       <View style={[styles.fabWrap, { bottom: insets.bottom + spacing.md }]} pointerEvents="box-none">
@@ -198,6 +201,8 @@ const styles = StyleSheet.create({
   entryCalories: { fontSize: 15, fontWeight: '700', color: colors.text, fontVariant: ['tabular-nums'] },
   hint: { textAlign: 'center', color: colors.textMuted, fontSize: 12 },
   attribution: { textAlign: 'center', color: colors.textMuted, fontSize: 12, marginTop: spacing.sm },
+  aboutLink: { alignSelf: 'center', paddingVertical: spacing.xs, marginTop: 2 },
+  aboutLinkText: { color: colors.primary, fontSize: 13, fontWeight: '600' },
   fabWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
   fab: {
     flexDirection: 'row',

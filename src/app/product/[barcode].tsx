@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { USER_AGENT } from '../../appInfo';
 import { Chip } from '../../components/Chip';
 import { Icon } from '../../components/Icon';
 import { LabeledInput } from '../../components/LabeledInput';
@@ -58,7 +59,7 @@ export default function ProductScreen() {
       return;
     }
 
-    const result = await fetchProduct(barcode);
+    const result = await fetchProduct(barcode, USER_AGENT);
     if (result.status === 'found') {
       const food: FoodItem = { ...result.product, source: 'openfoodfacts' };
       await saveFoodItem(db, food);

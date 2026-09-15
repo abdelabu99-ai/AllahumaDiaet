@@ -1,0 +1,116 @@
+---
+title: Datenschutzerklärung – HALABI
+---
+
+# Datenschutzerklärung
+
+> **Entwurf, keine Rechtsberatung.** Alle mit TODO markierten Stellen vor der Veröffentlichung prüfen und die TODO-Hinweise entfernen.
+
+Stand: <!-- TODO: Datum der Veröffentlichung eintragen --> TT.MM.JJJJ
+
+Diese Datenschutzerklärung gilt für die App **HALABI** für iOS und Android sowie für diese Webseite.
+
+## 1. Verantwortlicher
+
+Karim Abu Elkheir<br>
+Nehringstraße 23<br>
+14059 Berlin<br>
+Deutschland<br>
+E-Mail: [abdel.abu99@gmail.com](mailto:abdel.abu99@gmail.com)
+
+<!-- TODO: Prüfen, ob ein Datenschutzbeauftragter benannt werden muss (in der Regel nicht für Einzelpersonen ohne Beschäftigte). -->
+
+## 2. Das Wichtigste in Kürze
+
+- HALABI hat **kein Konto, keine Werbung, kein Tracking und keine eigenen Analyse-Werkzeuge**.
+- Alles, was du in der App eingibst – Profil, Gewicht, Tagebuch, selbst angelegte Produkte –, wird **nur auf deinem Gerät** gespeichert. Ich als Anbieter habe darauf keinen Zugriff.
+- Nur wenn du ein Produkt scannst oder eine Barcode-Nummer eingibst, fragt die App die Datenbank **Open Food Facts** ab. Dabei werden der Barcode und technisch bedingt deine IP-Adresse übermittelt.
+
+## 3. Speicherung auf deinem Gerät
+
+Die App speichert folgende Angaben in einer lokalen Datenbank auf deinem Gerät:
+
+- Profil: Alter, Geschlecht, Größe, aktuelles Gewicht, Zielgewicht, Aktivitätslevel, berechnetes Kalorienziel und Makroverteilung
+- Tagebuch: gegessene Produkte mit Menge, Mahlzeit, Datum und Uhrzeit
+- Produkte: Name, Marke, Nährwerte und ggf. Bild-Adresse von gescannten oder selbst eingegebenen Produkten
+
+Diese Daten verlassen dein Gerät nicht durch die App und werden nicht an mich oder Dritte übermittelt. Da Gewicht und Ernährungsangaben Gesundheitsdaten im Sinne von Art. 9 DSGVO sein können, verarbeitet die App sie ausschließlich lokal.
+
+Das Speichern auf deinem Gerät ist für die von dir gewünschte Funktion unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).
+<!-- TODO: Rechtsgrundlage prüfen lassen. Da der Anbieter keinen Zugriff hat, ist fraglich, ob überhaupt eine Verarbeitung durch den Verantwortlichen im Sinne der DSGVO vorliegt. -->
+
+## 4. Kamera
+
+Für das Scannen fragt die App nach der Kamera-Berechtigung. Das Kamerabild wird nur live auf deinem Gerät ausgewertet, um einen Barcode zu erkennen. Es werden **keine Fotos oder Videos gespeichert oder übertragen**. Die Berechtigung kannst du jederzeit in den Einstellungen deines Geräts entziehen; Barcodes lassen sich dann weiterhin von Hand eingeben.
+
+- **iOS:** Die Erkennung erfolgt mit den Systemfunktionen von Apple direkt auf dem Gerät.
+- **Android:** Die Erkennung nutzt die Bibliothek Google ML Kit der Google Ireland Limited. Das Kamerabild wird auch hier nur auf dem Gerät ausgewertet. ML Kit sendet jedoch technische Diagnosedaten an Google: Geräteinformationen (Hersteller, Modell, Betriebssystemversion), App-Informationen (Paketname, Version), Leistungswerte sowie Ereignis- und Fehlercodes. Nach Angaben von Google dienen sie der Diagnose und Nutzungsanalyse und werden nicht an Dritte weitergegeben ([Angaben von Google](https://developers.google.com/ml-kit/android-data-disclosure)).
+  <!-- TODO: Rechtsgrundlage und Rolle von Google für die ML-Kit-Diagnosedaten prüfen (betrifft nur Android) und das Datensicherheits-Formular bei Google Play entsprechend ausfüllen. Die iOS-Version ist davon nicht betroffen. -->
+
+## 5. Produktabfrage bei Open Food Facts
+
+Wenn du einen Barcode scannst oder eintippst und das Produkt noch nicht auf deinem Gerät gespeichert ist, sendet die App eine Anfrage an die Datenbank Open Food Facts. Übermittelt werden:
+
+- der Barcode des Produkts,
+- deine IP-Adresse (technisch notwendig, um die Antwort zurückzusenden),
+- eine technische Kennung der App (App-Name, Version und Kontakt-E-Mail des Anbieters, kein Bezug zu dir).
+
+Anbieter der Datenbank ist Open Food Facts, eine Vereinigung nach französischem Recht mit Sitz in 21 rue des Iles, 94100 Saint-Maur-des-Fossés, Frankreich. Open Food Facts verarbeitet diese Daten in eigener Verantwortung; Details findest du in der [Datenschutzerklärung von Open Food Facts](https://world.openfoodfacts.org/privacy). Nach deren Angaben werden IP-Adressen in Server-Logs für Sicherheit, technische Analysen und Statistik gespeichert.
+
+Die Übermittlung erfolgt nur, wenn du aktiv ein Produkt suchst, und ist für diese Funktion erforderlich. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; das berechtigte Interesse liegt darin, dir die gewünschten Produktdaten anzuzeigen.
+<!-- TODO: Rechtsgrundlage (lit. b oder lit. f) und die Rolle von Open Food Facts (eigener Verantwortlicher, kein Auftragsverarbeiter) rechtlich prüfen. Prüfen, ob Open Food Facts Dienstleister außerhalb der EU einsetzt. -->
+
+Gefundene Produktdaten werden anschließend auf deinem Gerät gespeichert, damit spätere Scans ohne erneute Abfrage funktionieren.
+
+## 6. Produktbilder
+
+Hat ein Produkt bei Open Food Facts ein Bild, lädt die App es von den Servern von Open Food Facts. Dabei wird ebenfalls deine IP-Adresse an Open Food Facts übermittelt. Es gelten die Angaben aus Abschnitt 5.
+
+## 7. Kein Tracking, keine Weitergabe
+
+Die App enthält keine Werbung, keine Analyse- oder Tracking-Werkzeuge und kein Crash-Reporting. Ich gebe keine Daten an Dritte weiter und verkaufe keine Daten. Ausnahmen sind nur die in den Abschnitten 4 bis 6 beschriebenen Übermittlungen, die technisch für das Scannen und die Produktsuche nötig sind.
+
+## 8. Geräte-Backups
+
+Die App selbst synchronisiert nichts. Je nach Einstellungen deines Geräts können die App-Daten aber in Backups des Betriebssystems enthalten sein, zum Beispiel im **iCloud-Backup** (Apple) oder in der **Android-Datensicherung** (Google). Diese Backups richtest du selbst ein; sie unterliegen den Bedingungen von Apple bzw. Google. Ich habe darauf keinen Zugriff.
+<!-- TODO: Prüfen, ob Backups ausgeschlossen werden sollen (iOS: Ausschluss vom Backup; Android: allowBackup). Aktuell sind sie nicht ausgeschlossen. -->
+
+## 9. Daten löschen
+
+Du kannst alle Daten jederzeit in der App unter **Info & Rechtliches → Alle Daten löschen** entfernen. Auch das Deinstallieren der App löscht die lokal gespeicherten Daten. Kopien in Geräte-Backups (Abschnitt 8) werden erst entfernt, wenn du das jeweilige Backup löschst oder es überschrieben wird.
+
+## 10. Kontakt per E-Mail
+
+Wenn du mir eine E-Mail schreibst, verarbeite ich deine E-Mail-Adresse und den Inhalt deiner Nachricht, um deine Anfrage zu beantworten (Art. 6 Abs. 1 lit. f DSGVO). Die Nachricht wird gelöscht, wenn sie erledigt ist und keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
+<!-- TODO: E-Mail-Anbieter (Google Gmail) nennen und Speicherdauer konkretisieren. -->
+
+## 11. Diese Webseite
+
+Diese Webseite wird über **GitHub Pages** der GitHub, Inc. (USA, ein Unternehmen von Microsoft) bereitgestellt. Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie deine IP-Adresse in Server-Logs. Die Seite verwendet selbst keine Cookies und kein Tracking.
+<!-- TODO: Angaben zu GitHub Pages prüfen (Rechtsgrundlage Art. 6 Abs. 1 lit. f DSGVO, Drittlandübermittlung in die USA, EU-US Data Privacy Framework, Link zur GitHub-Datenschutzerklärung https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement). -->
+
+## 12. Deine Rechte
+
+Du hast nach der DSGVO das Recht auf
+
+- Auskunft (Art. 15),
+- Berichtigung (Art. 16),
+- Löschung (Art. 17),
+- Einschränkung der Verarbeitung (Art. 18),
+- Datenübertragbarkeit (Art. 20) und
+- Widerspruch gegen Verarbeitungen auf Grundlage berechtigter Interessen (Art. 21).
+
+Da die App-Daten nur auf deinem Gerät liegen, kannst du sie dort selbst einsehen, ändern und löschen. Für Daten bei Open Food Facts wende dich an Open Food Facts (privacy@openfoodfacts.org). Für alle anderen Anliegen genügt eine E-Mail an die oben genannte Adresse.
+
+## 13. Beschwerderecht
+
+Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO). Zuständig für den Verantwortlichen ist:
+
+Berliner Beauftragte für Datenschutz und Informationsfreiheit<br>
+Alt-Moabit 59–61<br>
+10555 Berlin<br>
+[www.datenschutz-berlin.de](https://www.datenschutz-berlin.de)
+
+## 14. Änderungen
+
+Ändert sich die App so, dass andere Daten verarbeitet werden, passe ich diese Datenschutzerklärung an.

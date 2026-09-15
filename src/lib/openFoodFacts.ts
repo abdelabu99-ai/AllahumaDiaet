@@ -11,8 +11,6 @@ const FIELDS = [
   'product_quantity_unit',
   'image_front_small_url',
 ].join(',');
-// Open Food Facts bittet um einen eindeutigen User-Agent mit Kontaktmöglichkeit.
-const USER_AGENT = 'AllahumaDiaet/1.0 (https://github.com/abdelabu99-ai/AllahumaDiaet)';
 const TIMEOUT_MS = 8000;
 const KJ_PER_KCAL = 4.184;
 
@@ -103,14 +101,19 @@ export function parseProduct(barcode: string, raw: RawProduct): LookupResult {
   };
 }
 
-export async function fetchProduct(barcode: string): Promise<LookupResult> {
+/** Open Food Facts bittet um einen eindeutigen User-Agent mit Kontaktmöglichkeit, z. B. `HALABI/1.0.0 (mail@example.com)`. */
+export function buildUserAgent(appName: string, appVersion: string, contactEmail: string): string {
+  return `${appName}/${appVersion} (${contactEmail})`;
+}
+
+export async function fetchProduct(barcode: string, userAgent: string): Promise<LookupResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
     const url = `${API_BASE}/${encodeURIComponent(barcode)}.json?fields=${FIELDS}`;
     const response = await fetch(url, {
-      headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+      headers: { 'User-Agent': userAgent, Accept: 'application/json' },
       signal: controller.signal,
     });
 

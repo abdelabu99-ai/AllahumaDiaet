@@ -1,4 +1,4 @@
-# AllahumaDiaet
+# HALABI
 
 Kalorientracker-App für iPhone und Android nach dem Prinzip „Scan & Go“: öffnen, Barcode scannen, Menge eintippen, fertig.
 
@@ -13,11 +13,13 @@ Kalorientracker-App für iPhone und Android nach dem Prinzip „Scan & Go“: ö
 
    ```bash
    npm install
-   npx expo start
+   npx expo start --go
    ```
 
+   `--go` ist nötig, weil das Projekt `expo-dev-client` enthält und `expo start` sonst einen Development Build erwartet.
+
 3. Den QR-Code im Terminal scannen – auf dem iPhone mit der Kamera-App, auf Android in Expo Go.
-   Handy und PC müssen im selben WLAN sein. Klappt das nicht, `npx expo start --tunnel` verwenden.
+   Handy und PC müssen im selben WLAN sein. Klappt das nicht, `npx expo start --go --tunnel` verwenden.
 
 ## Entwicklung
 
@@ -32,4 +34,54 @@ npm run typecheck # TypeScript
 | `src/db` | SQLite-Schema und Abfragen |
 | `src/lib` | Reine Logik: Nährwerte, Barcodes, Open Food Facts, Formatierung |
 | `src/components` | UI-Bausteine |
+| `src/legal` | Impressum, rechtliche Links, generierte Lizenzliste |
 | `tests` | Tests mit dem eingebauten Node-Testrunner |
+| `scripts` | `npm run icons` (Icons aus `assets/source/icon.svg`), `npm run licenses` (Lizenzliste) |
+| `docs` | Datenschutz, Impressum, Support (GitHub Pages) und die App-Store-Connect-Checkliste |
+
+Nach dem Hinzufügen oder Aktualisieren von Paketen `npm run licenses` ausführen, damit die Liste unter *Info & Rechtliches* aktuell bleibt.
+
+## Veröffentlichen
+
+Gebaut und hochgeladen wird mit [EAS](https://docs.expo.dev/eas/) in der Cloud – ein Mac ist nicht nötig.
+Die Profile stehen in `eas.json`:
+
+| Profil | Zweck |
+| --- | --- |
+| `development` | Development Build mit `expo-dev-client` zum Testen nativer Änderungen, interne Verteilung |
+| `preview` | Release-Build zum Testen auf registrierten Geräten, interne Verteilung |
+| `production` | Build für den App Store; die Build-Nummer wird automatisch erhöht |
+
+Versionsnummern verwaltet EAS zentral (`cli.appVersionSource: "remote"`). Die sichtbare Version (`1.0.0`) steht weiterhin in `app.json` unter `version` und wird dort für jedes Update von Hand erhöht.
+
+### Einmalig einrichten
+
+```bash
+npm install -g eas-cli
+eas login
+eas init
+```
+
+`eas init` legt das Projekt bei Expo an und trägt `extra.eas.projectId` in `app.json` ein. Danach `slug` nicht mehr ändern.
+
+### App Store
+
+```bash
+eas build --platform ios --profile production
+eas submit --platform ios --profile production
+```
+
+Beim ersten Build fragt EAS nach dem Apple-Konto und erstellt Zertifikat und Provisioning Profile selbst. Nichts davon gehört ins Repository.
+
+**`ascAppId` eintragen:** In `eas.json` steht unter `submit.production.ios.ascAppId` der Platzhalter `TODO_ASC_APP_ID`. Nachdem die App in App Store Connect angelegt ist, dort unter *App-Informationen → Apple-ID* die Nummer ablesen (nur Ziffern) und den Platzhalter damit ersetzen. Bis dahin fragt bzw. scheitert `eas submit`.
+
+### Auf eigenen Geräten testen (optional)
+
+```bash
+eas device:create
+eas build --platform ios --profile preview
+```
+
+iPhones müssen für interne Builds vorher mit `eas device:create` registriert werden.
+
+Weitere Schritte außerhalb des Codes (Datenschutzangaben, Screenshots, Altersfreigabe …) stehen in [`docs/app-store-connect.md`](docs/app-store-connect.md).

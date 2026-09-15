@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { parseProduct } from '../src/lib/openFoodFacts.ts';
+import { buildUserAgent, parseProduct } from '../src/lib/openFoodFacts.ts';
+
+describe('buildUserAgent', () => {
+  it('nennt App, Version und Kontakt', () => {
+    assert.equal(buildUserAgent('HALABI', '1.0.0', 'kontakt@example.com'), 'HALABI/1.0.0 (kontakt@example.com)');
+  });
+});
 
 describe('parseProduct', () => {
   it('liest vollständige Produkte', () => {

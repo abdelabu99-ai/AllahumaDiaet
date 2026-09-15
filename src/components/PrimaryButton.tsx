@@ -7,12 +7,12 @@ type Props = {
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger';
   style?: StyleProp<ViewStyle>;
 };
 
 export function PrimaryButton({ label, onPress, disabled = false, loading = false, variant = 'primary', style }: Props) {
-  const isPrimary = variant === 'primary';
+  const isFilled = variant !== 'secondary';
   const inactive = disabled || loading;
 
   return (
@@ -23,17 +23,18 @@ export function PrimaryButton({ label, onPress, disabled = false, loading = fals
       accessibilityState={{ disabled: inactive }}
       style={({ pressed }) => [
         styles.button,
-        isPrimary ? styles.primary : styles.secondary,
-        pressed && isPrimary && { backgroundColor: colors.primaryPressed },
-        pressed && !isPrimary && { opacity: 0.7 },
+        styles[variant],
+        pressed && variant === 'primary' && { backgroundColor: colors.primaryPressed },
+        pressed && variant === 'danger' && { backgroundColor: colors.dangerPressed },
+        pressed && variant === 'secondary' && { opacity: 0.7 },
         inactive && { opacity: 0.4 },
         style,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary ? colors.onPrimary : colors.text} />
+        <ActivityIndicator color={isFilled ? colors.onPrimary : colors.text} />
       ) : (
-        <Text style={[styles.label, !isPrimary && { color: colors.text }]}>{label}</Text>
+        <Text style={[styles.label, !isFilled && { color: colors.text }]}>{label}</Text>
       )}
     </Pressable>
   );
@@ -43,5 +44,6 @@ const styles = StyleSheet.create({
   button: { height: 58, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
   primary: { backgroundColor: colors.primary },
   secondary: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  danger: { backgroundColor: colors.danger },
   label: { fontSize: 18, fontWeight: '700', color: colors.onPrimary },
 });
