@@ -188,6 +188,18 @@ export async function deleteLogEntry(db: SQLiteDatabase, id: string): Promise<vo
   await db.runAsync('DELETE FROM log_entry WHERE id = ?', id);
 }
 
+/** Löscht Profil, Tagebuch und gespeicherte Produkte. Das Schema bleibt erhalten. */
+export async function deleteAllData(db: SQLiteDatabase): Promise<void> {
+  await db.withExclusiveTransactionAsync(async (txn) => {
+    // log_entry zuerst, weil es per Fremdschlüssel auf food_item zeigt.
+    await txn.runAsync('DELETE FROM log_entry');
+    await txn.runAsync('DELETE FROM food_item');
+    await txn.runAsync('DELETE FROM user_profile');
+  });
+  // Gelöschte Zeilen bleiben sonst in freien Seiten und im WAL lesbar, bis sie überschrieben werden.
+  await db.execAsync('PRAGMA wal_checkpoint(TRUNCATE); VACUUM;');
+}
+
 export async function getEntriesForDate(db: SQLiteDatabase, date: string): Promise<LogEntryWithFood[]> {
   const rows = await db.getAllAsync<LogEntryRow>(
     `SELECT e.id, e.timestamp, e.meal_type, e.consumed_weight_g,

@@ -50,11 +50,13 @@ export default function Onboarding() {
   const [carbs, setCarbs] = useState(toPercent(DEFAULT_MACRO_SPLIT.carbs));
   const [fat, setFat] = useState(toPercent(DEFAULT_MACRO_SPLIT.fat));
   const [saving, setSaving] = useState(false);
+  const [hasProfile, setHasProfile] = useState(false);
 
   // Beim Bearbeiten die gespeicherten Werte vorbefüllen.
   useEffect(() => {
     getProfile(db).then((p) => {
       if (!p) return;
+      setHasProfile(true);
       setAge(String(p.age));
       setSex(p.sex);
       setHeight(toInputText(p.heightCm));
@@ -205,6 +207,11 @@ export default function Onboarding() {
           Barcode an Open Food Facts gesendet, um das Produkt zu finden.
         </Text>
         <Text style={styles.note}>Die Berechnung ist ein Richtwert und ersetzt keine ärztliche Beratung.</Text>
+        {hasProfile && (
+          <Pressable onPress={() => router.push('/about')} hitSlop={8} style={styles.aboutLink} accessibilityRole="link">
+            <Text style={styles.aboutLinkText}>Info & Rechtliches</Text>
+          </Pressable>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -241,4 +248,6 @@ const styles = StyleSheet.create({
   resultValue: { fontSize: 34, fontWeight: '800', color: colors.text, marginVertical: 4 },
   resultHint: { fontSize: 13, color: colors.textMuted, textAlign: 'center', marginTop: 2 },
   note: { fontSize: 13, color: colors.textMuted, marginTop: spacing.md, lineHeight: 19, textAlign: 'center' },
+  aboutLink: { alignSelf: 'center', paddingVertical: spacing.xs, marginTop: spacing.md },
+  aboutLinkText: { color: colors.primary, fontSize: 14, fontWeight: '600' },
 });

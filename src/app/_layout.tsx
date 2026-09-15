@@ -20,6 +20,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ title: 'Dein Profil' }} />
+        <Stack.Screen name="about" options={{ title: 'Info & Rechtliches' }} />
         <Stack.Screen name="scan" options={{ presentation: 'fullScreenModal', headerShown: false, animation: 'fade' }} />
         {/* Eigene Kopfzeile, damit die Tastatur den Speichern-Button nicht verdeckt. */}
         <Stack.Screen name="product/[barcode]" options={{ headerShown: false }} />
