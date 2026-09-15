@@ -366,7 +366,7 @@
   },
   {
     "name": "@expo/cli",
-    "version": "57.0.24",
+    "version": "57.0.25",
     "license": "MIT"
   },
   {
@@ -491,7 +491,7 @@
   },
   {
     "name": "@expo/router-server",
-    "version": "57.0.9",
+    "version": "57.0.10",
     "license": "MIT"
   },
   {
@@ -946,7 +946,7 @@
   },
   {
     "name": "babel-preset-expo",
-    "version": "57.0.11",
+    "version": "57.0.12",
     "license": "MIT"
   },
   {
@@ -1331,7 +1331,7 @@
   },
   {
     "name": "expo",
-    "version": "57.0.22",
+    "version": "57.0.23",
     "license": "MIT"
   },
   {
