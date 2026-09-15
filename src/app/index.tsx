@@ -90,7 +90,7 @@ export default function Dashboard() {
         </View>
 
         {entries.length === 0 ? (
-          <Text style={styles.empty}>Noch nichts eingetragen.{'\n'}Tippe unten auf „Scannen“.</Text>
+          <Text style={styles.empty}>Noch nichts eingetragen.{'\n'}Tippe unten auf „Scannen“ oder die Lupe.</Text>
         ) : (
           MEAL_TYPES.map(({ value, label }) => {
             const mealEntries = entries.filter((e) => e.mealType === value);
@@ -150,6 +150,14 @@ export default function Dashboard() {
 
       <View style={[styles.fabWrap, { bottom: insets.bottom + spacing.md }]} pointerEvents="box-none">
         <Pressable
+          onPress={() => router.push('/search')}
+          accessibilityRole="button"
+          accessibilityLabel="Lebensmittel suchen"
+          style={({ pressed }) => [styles.searchButton, pressed && { opacity: 0.7 }]}
+        >
+          <Icon name="search" color={colors.text} size={26} />
+        </Pressable>
+        <Pressable
           onPress={() => router.push('/scan')}
           accessibilityRole="button"
           accessibilityLabel="Barcode scannen"
@@ -206,13 +214,29 @@ const styles = StyleSheet.create({
   attribution: { textAlign: 'center', color: colors.textMuted, fontSize: 12, marginTop: spacing.sm },
   aboutLink: { alignSelf: 'center', paddingVertical: spacing.xs, marginTop: 2 },
   aboutLinkText: { color: colors.primary, fontSize: 13, fontWeight: '600' },
-  fabWrap: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
+  // Such- und Scan-Button gemeinsam zentriert; Scannen bleibt primär und mindestens 64 pt hoch.
+  fabWrap: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: spacing.md },
+  searchButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
   fab: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     height: 72,
-    paddingHorizontal: 44,
+    paddingHorizontal: 36,
     borderRadius: radius.pill,
     backgroundColor: colors.primary,
     shadowColor: '#000',

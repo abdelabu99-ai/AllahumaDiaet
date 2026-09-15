@@ -281,6 +281,14 @@ export async function searchLocalFoods(db: SQLiteDatabase, query: string, limit:
   return rankFoods(rows.map(toFoodItem), query, limit);
 }
 
+/** Lokal gespeicherte Lebensmittel zu den angegebenen Schlüsseln (fehlende werden ausgelassen). */
+export async function getFoodItemsByKeys(db: SQLiteDatabase, keys: string[]): Promise<FoodItem[]> {
+  if (keys.length === 0) return [];
+  const placeholders = keys.map(() => '?').join(', ');
+  const rows = await db.getAllAsync<FoodItemRow>(`SELECT * FROM food_item WHERE barcode IN (${placeholders})`, ...keys);
+  return rows.map(toFoodItem);
+}
+
 export async function getRecentFoods(db: SQLiteDatabase, limit: number): Promise<FoodItem[]> {
   const rows = await db.getAllAsync<FoodItemRow>(
     `SELECT f.*

@@ -72,6 +72,7 @@ export default function Scanner() {
           <PrimaryButton label="Einstellungen öffnen" onPress={() => Linking.openSettings()} />
         )}
         <PrimaryButton label="Nummer eintippen" variant="secondary" onPress={() => setManualOpen(true)} style={{ marginTop: spacing.sm }} />
+        <PrimaryButton label="Stattdessen suchen" variant="secondary" onPress={() => router.replace('/search')} style={{ marginTop: spacing.sm }} />
         <PrimaryButton label="Abbrechen" variant="secondary" onPress={() => router.back()} style={{ marginTop: spacing.sm }} />
         {renderManualModal()}
       </View>
@@ -150,6 +151,9 @@ export default function Scanner() {
           <Icon name="keyboard" color="#fff" size={22} />
           <Text style={styles.manualLabel}>Nummer eintippen</Text>
         </Pressable>
+        <Pressable onPress={() => router.replace('/search')} hitSlop={8} style={styles.searchLink} accessibilityRole="link">
+          <Text style={styles.searchLinkText}>Stattdessen suchen</Text>
+        </Pressable>
       </View>
 
       {renderManualModal()}
@@ -189,6 +193,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   manualLabel: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  searchLink: { marginTop: spacing.md, paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: radius.pill, backgroundColor: 'rgba(0,0,0,0.45)' },
+  searchLinkText: { color: '#fff', fontSize: 15, fontWeight: '600', textDecorationLine: 'underline' },
   permission: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.lg, justifyContent: 'center' },
   permissionTitle: { fontSize: 24, fontWeight: '800', color: colors.text, marginBottom: spacing.sm, textAlign: 'center' },
   permissionText: { fontSize: 16, color: colors.textMuted, textAlign: 'center', marginBottom: spacing.lg, lineHeight: 22 },

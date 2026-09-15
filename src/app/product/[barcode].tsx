@@ -38,6 +38,7 @@ import { defaultMealType, formatDecimal, formatInt, MEAL_TYPES, parseDecimal, to
 import { nutrientsForPortion } from '../../lib/nutrition';
 import { fetchProduct, type PartialProduct } from '../../lib/openFoodFacts';
 import { portionPresets, validPortionGrams } from '../../lib/portions';
+import { getSearchHit } from '../../lib/searchHandoff';
 import { colors, radius, spacing } from '../../theme';
 
 type ScreenState =
@@ -80,7 +81,8 @@ export default function ProductScreen() {
       return;
     }
 
-    const result = await fetchProduct(foodKey, USER_AGENT);
+    // Aus der Online-Suche übernommen: kein zweiter Abruf, noch nichts in der Datenbank.
+    const result = getSearchHit(foodKey) ?? (await fetchProduct(foodKey, USER_AGENT));
     if (result.status === 'found') {
       // Erst beim Speichern des Eintrags (oder einer Korrektur) landet das Produkt in food_item.
       setState({ kind: 'ready', food: asUnsaved({ ...result.product, source: 'openfoodfacts' }), persisted: false });
