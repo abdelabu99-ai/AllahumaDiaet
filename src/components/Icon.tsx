@@ -14,6 +14,7 @@ const PATHS = {
   search: 'M11 18a7 7 0 100-14 7 7 0 000 14zM20 20l-4-4',
   pencil: 'M4 20h4l10.5-10.5a2.8 2.8 0 10-4-4L4 16v4zM13.5 6.5l4 4',
   chevronLeft: 'M15 18l-6-6 6-6',
+  chevronRight: 'M9 18l6-6-6-6',
 } as const;
 
 export type IconName = keyof typeof PATHS;

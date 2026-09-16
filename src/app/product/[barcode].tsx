@@ -34,6 +34,7 @@ import {
   type FoodItem,
   type NewFoodItem,
 } from '../../db/repository';
+import { combineDayWithTime, parseDateKey } from '../../lib/date';
 import { isCustomFoodKey, parseFoodKey } from '../../lib/foodKey';
 import { chooseFoodSource } from '../../lib/foodSource';
 import { defaultMealType, formatDecimal, formatInt, MEAL_TYPES, parseDecimal, toInputText, type MealType } from '../../lib/format';
@@ -57,9 +58,11 @@ export default function ProductScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   // `barcode` ist eine GTIN oder ein `custom:`-Schlüssel; `name` füllt ein neues eigenes Lebensmittel vor.
-  const params = useLocalSearchParams<{ barcode: string; name?: string }>();
+  const params = useLocalSearchParams<{ barcode: string; name?: string; date?: string }>();
   const foodKey = parseFoodKey(String(params.barcode ?? ''));
   const initialName = typeof params.name === 'string' ? params.name : '';
+  // Ohne Parameter bucht der Eintrag auf heute – wie vor der Tagesnavigation.
+  const selectedDay = typeof params.date === 'string' ? parseDateKey(params.date) : null;
 
   const [state, setState] = useState<ScreenState>({ kind: 'loading' });
 
@@ -139,6 +142,7 @@ export default function ProductScreen() {
         <PortionForm
           food={state.food}
           persisted={state.persisted}
+          day={selectedDay}
           onFoodChange={(food) => setState({ kind: 'ready', food, persisted: true })}
           onSaved={() => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -155,11 +159,13 @@ export default function ProductScreen() {
 type PortionFormProps = {
   food: FoodItem;
   persisted: boolean;
+  /** Tag, auf den der Eintrag gebucht wird; `null` bedeutet heute. */
+  day: Date | null;
   onFoodChange: (food: FoodItem) => void;
   onSaved: () => void;
 };
 
-function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProps) {
+function PortionForm({ food, persisted, day, onFoodChange, onSaved }: PortionFormProps) {
   const db = useSQLiteContext();
   const insets = useSafeAreaInsets();
   const [amount, setAmount] = useState('');
@@ -181,7 +187,9 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
     try {
       // Erst das Produkt, dann der Eintrag: log_entry verweist per Fremdschlüssel darauf.
       if (!persisted) await saveFoodItem(db, food);
-      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType, per100g });
+      // Datum des gewählten Tages, Uhrzeit von jetzt.
+      const at = day ? combineDayWithTime(day, new Date()) : undefined;
+      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType, per100g, at });
       onSaved();
     } catch {
       Alert.alert('Speichern fehlgeschlagen', 'Der Eintrag konnte nicht gespeichert werden. Bitte versuche es erneut.');
