@@ -1,7 +1,19 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Chip } from '../../components/Chip';
@@ -15,7 +27,7 @@ import { nutrientsForPortion } from '../../lib/nutrition';
 import { portionPresets, validPortionGrams } from '../../lib/portions';
 import { colors, radius, spacing } from '../../theme';
 
-export default function EntrySheet() {
+export default function EntryScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -106,8 +118,9 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
   };
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.header}>
+    // Wie im Produkt-Screen: Die Tastatur verkleinert den Bereich, die Buttons bleiben erreichbar.
+    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
         <View style={styles.headerText}>
           <Text style={styles.name} numberOfLines={2}>
             {entry.name}
@@ -129,9 +142,6 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
         keyboardShouldPersistTaps="handled"
         // Auf iOS folgt die Tastatur dem Finger; zusaetzlicher Weg, sie ohne „Fertig“ zu schliessen.
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
-        // iOS legt genau den von der Tastatur verdeckten Bereich als Abstand an. Ein eigener Abstand
-        // oder eigenes Scrollen kaeme obendrauf und wuerde den Inhalt aus dem Bild schieben.
-        automaticallyAdjustKeyboardInsets
       >
         <View style={styles.amountRow}>
           <TextInput
@@ -207,7 +217,7 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
       </View>
 
       <NumericDoneBar />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -226,7 +236,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
     gap: spacing.sm,
     backgroundColor: colors.background,
