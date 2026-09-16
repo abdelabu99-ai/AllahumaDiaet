@@ -120,9 +120,10 @@ export default function Dashboard() {
   );
 
   /** Wechselt den Tag mit Gleitanimation: alter Inhalt hinaus, neuer von der anderen Seite herein. */
+  // Worklets koennen keine Date-Objekte kopieren, deshalb wandert nur der Zeitstempel ueber die Grenze.
   const applyDay = useCallback(
-    (next: Date, direction: number) => {
-      setSelectedDate(startOfDay(next));
+    (nextTime: number, direction: number) => {
+      setSelectedDate(startOfDay(new Date(nextTime)));
       translateX.value = direction * width;
       translateX.value = withTiming(0, { duration: SLIDE_IN_MS });
     },
@@ -131,14 +132,13 @@ export default function Dashboard() {
 
   const slideToDay = useCallback(
     (next: Date) => {
-      if (isSameDay(next, selectedRef.current)) {
-        setCalendarOpen(false);
-        return;
-      }
-      const direction = next > selectedRef.current ? 1 : -1;
       setCalendarOpen(false);
+      if (isSameDay(next, selectedRef.current)) return;
+
+      const direction = next > selectedRef.current ? 1 : -1;
+      const nextTime = startOfDay(next).getTime();
       translateX.value = withTiming(-direction * width, { duration: SLIDE_OUT_MS }, (finished) => {
-        if (finished) runOnJS(applyDay)(next, direction);
+        if (finished) runOnJS(applyDay)(nextTime, direction);
       });
     },
     [applyDay, translateX, width],

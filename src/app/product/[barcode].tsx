@@ -482,8 +482,9 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
   );
 }
 
-const AMOUNT_FONT_SIZE = 52;
-const AMOUNT_LINE_HEIGHT = 62;
+const AMOUNT_FONT_SIZE = 48;
+// Kein lineHeight auf dem TextInput: iOS schiebt die Ziffern sonst aus dem Feld.
+const AMOUNT_ROW_HEIGHT = 72;
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
@@ -513,11 +514,16 @@ const styles = StyleSheet.create({
   panel: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.lg },
   panelHint: { fontSize: 13, color: colors.textMuted, marginBottom: spacing.md, lineHeight: 18 },
   // Wie im Eintrag-Fenster: feste Zeilenhöhe, damit die Ziffern im Feld bleiben.
-  amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', height: AMOUNT_LINE_HEIGHT },
+  amountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: AMOUNT_ROW_HEIGHT,
+    overflow: 'hidden',
+  },
   amountInput: {
     fontSize: AMOUNT_FONT_SIZE,
-    lineHeight: AMOUNT_LINE_HEIGHT,
-    height: AMOUNT_LINE_HEIGHT,
+    height: AMOUNT_ROW_HEIGHT,
     fontWeight: '800',
     color: colors.text,
     minWidth: 110,
