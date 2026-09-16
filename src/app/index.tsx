@@ -292,7 +292,7 @@ export default function Dashboard() {
                             key={entry.id}
                             onPress={() => router.push({ pathname: '/entry/[id]', params: { id: entry.id } })}
                             onLongPress={() => confirmDelete(entry)}
-                            style={({ pressed }) => [styles.entry, pressed && { opacity: 0.6 }]}
+                            style={({ pressed }) => [styles.entry, pressed && { backgroundColor: colors.surfacePressed }]}
                             accessibilityRole="button"
                             accessibilityLabel={`${entry.name}, ${formatDecimal(entry.grams)} Gramm, ${formatInt(entry.totals.calories)} Kilokalorien`}
                             accessibilityHint="Tippen zum Bearbeiten, lange drücken zum Löschen"
@@ -327,7 +327,7 @@ export default function Dashboard() {
           onPress={() => router.push({ pathname: '/search', params: { date: selectedKey } })}
           accessibilityRole="button"
           accessibilityLabel="Lebensmittel suchen"
-          style={({ pressed }) => [styles.searchButton, pressed && { opacity: 0.7 }]}
+          style={({ pressed }) => [styles.searchButton, pressed && { backgroundColor: colors.surfacePressed }]}
         >
           <Icon name="search" color={colors.text} size={26} />
         </Pressable>

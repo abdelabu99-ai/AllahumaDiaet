@@ -62,6 +62,8 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
   const [footerHeight, setFooterHeight] = useState(0);
   const keyboardHeight = useKeyboardHeight();
   const scrollRef = useRef<ScrollView>(null);
+  // Position des Naehrwert-Bereichs im Inhalt, um gezielt dorthin zu scrollen.
+  const panelY = useRef(0);
 
   const grams = parseDecimal(amount);
   const validGrams = validPortionGrams(grams);
@@ -94,8 +96,9 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
   };
 
   const scrollToNutrients = () => {
-    // Kurz warten, bis die Tastatur ihre Hoehe gemeldet hat.
-    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
+    // Nicht ans Ende springen (sonst steht unten nur leerer Platz), sondern den Bereich
+    // knapp unter die Kopfzeile holen. Kurze Verzoegerung, bis Layout und Tastatur stehen.
+    setTimeout(() => scrollRef.current?.scrollTo({ y: Math.max(panelY.current - spacing.sm, 0), animated: true }), 150);
   };
 
   const confirmDelete = () => {
@@ -137,7 +140,7 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
       <ScrollView
         ref={scrollRef}
         style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: footerHeight + keyboardHeight + spacing.lg }]}
+        contentContainerStyle={[styles.content, { paddingBottom: Math.max(footerHeight, keyboardHeight) + spacing.md }]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
@@ -191,7 +194,12 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
         />
 
         {editingNutrients && (
-          <View style={[styles.panel, styles.panelSpacing]}>
+          <View
+            style={[styles.panel, styles.panelSpacing]}
+            onLayout={(event) => {
+              panelY.current = event.nativeEvent.layout.y;
+            }}
+          >
             <Text style={styles.sectionLabel}>Nährwerte dieses Eintrags</Text>
             <NutritionFields editor={editor} onFieldFocus={scrollToNutrients} />
             <View style={styles.switchRow}>

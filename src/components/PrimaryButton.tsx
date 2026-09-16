@@ -44,7 +44,7 @@ export function PrimaryButton({
         styles[variant],
         pressed && variant === 'primary' && { backgroundColor: colors.primaryPressed },
         pressed && variant === 'danger' && { backgroundColor: colors.dangerPressed },
-        pressed && variant === 'secondary' && { opacity: 0.7 },
+        pressed && variant === 'secondary' && { backgroundColor: colors.surfacePressed },
         inactive && { opacity: 0.4 },
         style,
       ]}

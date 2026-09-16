@@ -32,7 +32,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function LinkText({ label, url }: { label: string; url: string }) {
   return (
-    <Text style={styles.link} onPress={() => openLink(url)} accessibilityRole="link">
+    <Text style={styles.link} suppressHighlighting onPress={() => openLink(url)} accessibilityRole="link">
       {label}
     </Text>
   );

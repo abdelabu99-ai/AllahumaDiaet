@@ -2,6 +2,8 @@ export const colors = {
   background: '#F5F6F8',
   surface: '#FFFFFF',
   border: '#E5E7EB',
+  // Dezente Rückmeldung beim Antippen heller Flächen.
+  surfacePressed: '#ECEDEF',
   text: '#111827',
   textMuted: '#6B7280',
   primary: '#16A34A',

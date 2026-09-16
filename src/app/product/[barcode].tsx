@@ -275,7 +275,7 @@ function PortionForm({ food, persisted, day, onFoodChange, onSaved }: PortionFor
         />
 
         {canRestore && !correcting && (
-          <Text style={[styles.link, styles.restoreLink]} onPress={restoring ? undefined : restore} accessibilityRole="button">
+          <Text style={[styles.link, styles.restoreLink]} suppressHighlighting onPress={restoring ? undefined : restore} accessibilityRole="button">
             {restoring ? 'Wird geladen …' : 'Werte von Open Food Facts wiederherstellen'}
           </Text>
         )}

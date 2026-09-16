@@ -340,7 +340,7 @@ function ResultRow({ name, brand, caloriesPer100g, imageUrl, onPress }: ResultRo
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.row, incomplete && styles.rowIncomplete, pressed && { opacity: 0.6 }]}
+      style={({ pressed }) => [styles.row, incomplete && styles.rowIncomplete, pressed && { backgroundColor: colors.surfacePressed }]}
       accessibilityRole="button"
       accessibilityLabel={[name, brand, detail].filter(Boolean).join(', ')}
     >
