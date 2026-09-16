@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Chip } from '../components/Chip';
 import { LabeledInput } from '../components/LabeledInput';
+import { NumericDoneBar } from '../components/NumericDoneBar';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { getProfile, saveProfile } from '../db/repository';
 import { formatInt, parseDecimal, toInputText } from '../lib/format';
@@ -213,6 +214,8 @@ export default function Onboarding() {
           </Pressable>
         )}
       </ScrollView>
+
+      <NumericDoneBar />
     </KeyboardAvoidingView>
   );
 }

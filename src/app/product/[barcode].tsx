@@ -21,6 +21,7 @@ import { USER_AGENT } from '../../appInfo';
 import { Chip } from '../../components/Chip';
 import { Icon } from '../../components/Icon';
 import { LabeledInput } from '../../components/LabeledInput';
+import { NumericDoneBar, numericAccessoryProps } from '../../components/NumericDoneBar';
 import { NutritionFields, useNutritionEditor } from '../../components/NutritionFields';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import {
@@ -144,6 +145,8 @@ export default function ProductScreen() {
           }}
         />
       )}
+
+      <NumericDoneBar />
     </KeyboardAvoidingView>
   );
 }
@@ -215,7 +218,7 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <View style={styles.productRow}>
           {food.imageUrl ? (
             <Image source={{ uri: food.imageUrl }} style={styles.productImage} resizeMode="contain" />
@@ -228,30 +231,40 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
             <Text style={styles.productName} numberOfLines={2}>
               {food.name}
             </Text>
-            {food.brand ? <Text style={styles.muted}>{food.brand}</Text> : null}
+            {food.brand ? (
+              <Text style={styles.muted} numberOfLines={2}>
+                {food.brand}
+              </Text>
+            ) : null}
             <Text style={styles.per100}>
               pro 100 g: {formatInt(food.caloriesPer100g)} kcal · P {formatDecimal(food.proteinPer100g)} · K{' '}
               {formatDecimal(food.carbsPer100g)} · F {formatDecimal(food.fatPer100g)}
             </Text>
-            <View style={styles.nutrientActions}>
-              {food.userEdited && (
+            {food.userEdited && (
+              <View style={styles.nutrientActions}>
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>Eigene Werte</Text>
                 </View>
-              )}
-              {!correcting && (
-                <Text style={styles.link} onPress={() => setCorrecting(true)} accessibilityRole="button">
-                  Nährwerte korrigieren
-                </Text>
-              )}
-            </View>
-            {canRestore && !correcting && (
-              <Text style={[styles.link, styles.restoreLink]} onPress={restoring ? undefined : restore} accessibilityRole="button">
-                {restoring ? 'Wird geladen …' : 'Werte von Open Food Facts wiederherstellen'}
-              </Text>
+              </View>
             )}
           </View>
         </View>
+
+        <PrimaryButton
+          label={correcting ? 'Nährwerte ausblenden' : 'Nährwerte korrigieren'}
+          variant="secondary"
+          icon="pencil"
+          trailingIcon={correcting ? 'chevronUp' : 'chevronDown'}
+          expanded={correcting}
+          onPress={() => setCorrecting((open) => !open)}
+          style={styles.correctButton}
+        />
+
+        {canRestore && !correcting && (
+          <Text style={[styles.link, styles.restoreLink]} onPress={restoring ? undefined : restore} accessibilityRole="button">
+            {restoring ? 'Wird geladen …' : 'Werte von Open Food Facts wiederherstellen'}
+          </Text>
+        )}
 
         {correcting && (
           <CorrectionPanel
@@ -268,6 +281,7 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
 
         <View style={styles.amountRow}>
           <TextInput
+            {...numericAccessoryProps}
             value={amount}
             onChangeText={setAmount}
             keyboardType="decimal-pad"
@@ -415,7 +429,7 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <Text style={styles.reason}>{REASON_TEXT[reason]}</Text>
         {reason === 'error' && (
           <PrimaryButton label="Erneut versuchen" variant="secondary" onPress={onRetry} style={{ marginBottom: spacing.md }} />
@@ -450,6 +464,9 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
   );
 }
 
+const AMOUNT_FONT_SIZE = 52;
+const AMOUNT_LINE_HEIGHT = 62;
+
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   header: {
@@ -473,20 +490,26 @@ const styles = StyleSheet.create({
   badge: { backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
   badgeText: { fontSize: 11, fontWeight: '600', color: colors.textMuted },
   link: { fontSize: 13, fontWeight: '600', color: colors.primary },
-  restoreLink: { marginTop: 6 },
+  restoreLink: { marginTop: spacing.sm, marginBottom: spacing.sm },
+  correctButton: { marginBottom: spacing.md },
   panel: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.lg },
   panelHint: { fontSize: 13, color: colors.textMuted, marginBottom: spacing.md, lineHeight: 18 },
-  amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center' },
+  // Wie im Eintrag-Fenster: feste Zeilenhöhe, damit die Ziffern im Feld bleiben.
+  amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', height: AMOUNT_LINE_HEIGHT },
   amountInput: {
-    fontSize: 64,
+    fontSize: AMOUNT_FONT_SIZE,
+    lineHeight: AMOUNT_LINE_HEIGHT,
+    height: AMOUNT_LINE_HEIGHT,
     fontWeight: '800',
     color: colors.text,
-    minWidth: 120,
+    minWidth: 110,
+    maxWidth: 220,
     textAlign: 'right',
     fontVariant: ['tabular-nums'],
     paddingVertical: 0,
+    includeFontPadding: false,
   },
-  amountUnit: { fontSize: 32, fontWeight: '700', color: colors.textMuted, marginLeft: 8 },
+  amountUnit: { fontSize: 28, fontWeight: '700', color: colors.textMuted, marginLeft: 8 },
   totals: { alignItems: 'center', marginTop: spacing.sm, marginBottom: spacing.lg },
   totalKcal: { fontSize: 24, fontWeight: '800', color: colors.primary, fontVariant: ['tabular-nums'] },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },

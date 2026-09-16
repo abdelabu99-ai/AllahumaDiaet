@@ -6,6 +6,7 @@ import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, StyleSheet, 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '../components/Icon';
+import { NumericDoneBar, numericAccessoryProps } from '../components/NumericDoneBar';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { normalizeBarcode } from '../lib/barcode';
 import { colors, radius, spacing } from '../theme';
@@ -86,6 +87,7 @@ export default function Scanner() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Barcode-Nummer eingeben</Text>
             <TextInput
+              {...numericAccessoryProps}
               value={manualCode}
               onChangeText={(t) => {
                 setManualCode(t.replace(/\D/g, ''));
@@ -103,6 +105,7 @@ export default function Scanner() {
             <PrimaryButton label="Suchen" onPress={submitManual} disabled={manualCode.length < 8} />
             <PrimaryButton label="Abbrechen" variant="secondary" onPress={() => setManualOpen(false)} style={{ marginTop: spacing.sm }} />
           </View>
+          <NumericDoneBar />
         </KeyboardAvoidingView>
       </Modal>
     );

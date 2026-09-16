@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from 'react-native';
 
 import { colors, radius } from '../theme';
+import { isNumericKeyboard, numericAccessoryProps } from './NumericDoneBar';
 
 type Props = Omit<TextInputProps, 'style'> & { label: string; unit?: string; error?: string | null };
 
@@ -11,6 +12,7 @@ export function LabeledInput({ label, unit, error, keyboardType = 'decimal-pad',
       <Text style={styles.label}>{label}</Text>
       <View style={[styles.inputRow, error ? { borderColor: colors.danger } : null]}>
         <TextInput
+          {...(isNumericKeyboard(keyboardType) ? numericAccessoryProps : null)}
           {...inputProps}
           keyboardType={keyboardType}
           placeholderTextColor={colors.textMuted}

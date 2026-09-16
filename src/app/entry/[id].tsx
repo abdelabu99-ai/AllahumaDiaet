@@ -1,11 +1,12 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Chip } from '../../components/Chip';
 import { Icon } from '../../components/Icon';
+import { NumericDoneBar, numericAccessoryProps } from '../../components/NumericDoneBar';
 import { NutritionFields, useNutritionEditor } from '../../components/NutritionFields';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import { deleteLogEntry, getLogEntry, updateFoodNutrients, updateLogEntry, type LogEntryDetail } from '../../db/repository';
@@ -101,22 +102,33 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <View style={styles.screen}>
       <View style={styles.header}>
         <View style={styles.headerText}>
           <Text style={styles.name} numberOfLines={2}>
             {entry.name}
           </Text>
-          {entry.brand ? <Text style={styles.muted}>{entry.brand}</Text> : null}
+          {entry.brand ? (
+            <Text style={styles.muted} numberOfLines={2}>
+              {entry.brand}
+            </Text>
+          ) : null}
         </View>
         <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="Schließen" style={styles.closeButton}>
           <Icon name="close" color={colors.textMuted} />
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        // Schiebt den Inhalt über die Tastatur, ohne die Buttons darunter mitzunehmen (iOS).
+        automaticallyAdjustKeyboardInsets
+      >
         <View style={styles.amountRow}>
           <TextInput
+            {...numericAccessoryProps}
             value={amount}
             onChangeText={setAmount}
             keyboardType="decimal-pad"
@@ -151,12 +163,17 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
           ))}
         </View>
 
-        {!editingNutrients ? (
-          <Text style={styles.link} onPress={() => setEditingNutrients(true)} accessibilityRole="button">
-            Nährwerte für diesen Eintrag ändern
-          </Text>
-        ) : (
-          <View style={styles.panel}>
+        <PrimaryButton
+          label={editingNutrients ? 'Nährwerte ausblenden' : 'Nährwerte für diesen Eintrag ändern'}
+          variant="secondary"
+          icon="pencil"
+          trailingIcon={editingNutrients ? 'chevronUp' : 'chevronDown'}
+          expanded={editingNutrients}
+          onPress={() => setEditingNutrients((open) => !open)}
+        />
+
+        {editingNutrients && (
+          <View style={[styles.panel, styles.panelSpacing]}>
             <Text style={styles.sectionLabel}>Nährwerte dieses Eintrags</Text>
             <NutritionFields editor={editor} />
             <View style={styles.switchRow}>
@@ -168,11 +185,11 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
                 accessibilityLabel="Auch für künftige Einträge dieses Lebensmittels übernehmen"
               />
             </View>
-            <Text style={styles.hint}>
-              {applyToFood
-                ? 'Das Lebensmittel wird dauerhaft korrigiert. Andere, bereits eingetragene Tage bleiben unverändert.'
-                : 'Nur dieser Eintrag ändert sich.'}
-            </Text>
+            {applyToFood && (
+              <Text style={styles.hint}>
+                Das Lebensmittel wird dauerhaft korrigiert. Andere, bereits eingetragene Tage bleiben unverändert.
+              </Text>
+            )}
           </View>
         )}
       </ScrollView>
@@ -181,36 +198,50 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
         <PrimaryButton label="Speichern" onPress={save} disabled={!canSave} loading={saving} />
         <PrimaryButton label="Eintrag löschen" variant="danger" onPress={confirmDelete} style={{ marginTop: spacing.sm }} />
       </View>
-    </KeyboardAvoidingView>
+
+      <NumericDoneBar />
+    </View>
   );
 }
+
+// Schriftgröße der Grammzahl und die dazu passende Zeilenhöhe.
+const AMOUNT_FONT_SIZE = 52;
+const AMOUNT_LINE_HEIGHT = 62;
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg, gap: spacing.md, backgroundColor: colors.background },
   fullWidth: { alignSelf: 'stretch' },
   header: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: spacing.md, paddingTop: spacing.lg, gap: spacing.sm },
-  headerText: { flex: 1 },
-  name: { fontSize: 20, fontWeight: '700', color: colors.text },
+  // flexShrink sorgt dafür, dass langer Text umbricht statt unter das X zu laufen.
+  headerText: { flex: 1, flexShrink: 1, paddingRight: spacing.xs },
+  name: { fontSize: 20, fontWeight: '700', color: colors.text, lineHeight: 26 },
   muted: { fontSize: 14, color: colors.textMuted },
   closeButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
   content: { padding: spacing.md, paddingBottom: spacing.lg },
-  amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center' },
+  // Feste Zeilenhöhe und Höhe: Ohne sie ragen die großen Ziffern auf iOS aus dem Feld heraus
+  // und überlagern die Kopfzeile darüber.
+  amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', height: AMOUNT_LINE_HEIGHT },
   amountInput: {
-    fontSize: 64,
+    fontSize: AMOUNT_FONT_SIZE,
+    lineHeight: AMOUNT_LINE_HEIGHT,
+    height: AMOUNT_LINE_HEIGHT,
     fontWeight: '800',
     color: colors.text,
-    minWidth: 120,
+    minWidth: 110,
+    maxWidth: 220,
     textAlign: 'right',
     fontVariant: ['tabular-nums'],
     paddingVertical: 0,
+    includeFontPadding: false,
   },
-  amountUnit: { fontSize: 32, fontWeight: '700', color: colors.textMuted, marginLeft: 8 },
+  amountUnit: { fontSize: 28, fontWeight: '700', color: colors.textMuted, marginLeft: 8 },
   totals: { alignItems: 'center', marginTop: spacing.sm, marginBottom: spacing.lg },
   totalKcal: { fontSize: 24, fontWeight: '800', color: colors.primary, fontVariant: ['tabular-nums'] },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
   link: { fontSize: 14, fontWeight: '600', color: colors.primary, alignSelf: 'flex-start', paddingVertical: spacing.xs },
   panel: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md },
+  panelSpacing: { marginTop: spacing.sm },
   sectionLabel: { fontSize: 16, fontWeight: '700', color: colors.text, marginBottom: spacing.sm },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.sm },
   switchLabel: { flex: 1, fontSize: 14, color: colors.text, lineHeight: 20 },
