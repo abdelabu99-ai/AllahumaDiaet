@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Chip } from '../../components/Chip';
@@ -127,7 +127,8 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
         style={styles.scroll}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
+        // Auf iOS folgt die Tastatur dem Finger; zusaetzlicher Weg, sie ohne „Fertig“ zu schliessen.
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
         // iOS legt genau den von der Tastatur verdeckten Bereich als Abstand an. Ein eigener Abstand
         // oder eigenes Scrollen kaeme obendrauf und wuerde den Inhalt aus dem Bild schieben.
         automaticallyAdjustKeyboardInsets
