@@ -21,6 +21,7 @@ import { USER_AGENT } from '../../appInfo';
 import { Chip } from '../../components/Chip';
 import { Icon } from '../../components/Icon';
 import { LabeledInput } from '../../components/LabeledInput';
+import { NumericDoneBar, numericAccessoryProps } from '../../components/NumericDoneBar';
 import { NutritionFields, useNutritionEditor } from '../../components/NutritionFields';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import {
@@ -33,7 +34,9 @@ import {
   type FoodItem,
   type NewFoodItem,
 } from '../../db/repository';
+import { combineDayWithTime, parseDateKey } from '../../lib/date';
 import { isCustomFoodKey, parseFoodKey } from '../../lib/foodKey';
+import { chooseFoodSource } from '../../lib/foodSource';
 import { defaultMealType, formatDecimal, formatInt, MEAL_TYPES, parseDecimal, toInputText, type MealType } from '../../lib/format';
 import { nutrientsForPortion } from '../../lib/nutrition';
 import { fetchProduct, type PartialProduct } from '../../lib/openFoodFacts';
@@ -55,9 +58,11 @@ export default function ProductScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   // `barcode` ist eine GTIN oder ein `custom:`-Schlüssel; `name` füllt ein neues eigenes Lebensmittel vor.
-  const params = useLocalSearchParams<{ barcode: string; name?: string }>();
+  const params = useLocalSearchParams<{ barcode: string; name?: string; date?: string }>();
   const foodKey = parseFoodKey(String(params.barcode ?? ''));
   const initialName = typeof params.name === 'string' ? params.name : '';
+  // Ohne Parameter bucht der Eintrag auf heute – wie vor der Tagesnavigation.
+  const selectedDay = typeof params.date === 'string' ? parseDateKey(params.date) : null;
 
   const [state, setState] = useState<ScreenState>({ kind: 'loading' });
 
@@ -68,9 +73,9 @@ export default function ProductScreen() {
     }
     setState({ kind: 'loading' });
 
-    // Zuerst lokal: schnell und funktioniert auch ohne Internet im Supermarkt.
+    // Zuerst lokal: schnell, offline nutzbar und korrigierte Werte gewinnen (chooseFoodSource).
     const local = await getFoodItem(db, foodKey);
-    if (local) {
+    if (chooseFoodSource({ local, remote: 'missing' }) === 'local' && local) {
       setState({ kind: 'ready', food: local, persisted: true });
       return;
     }
@@ -137,6 +142,7 @@ export default function ProductScreen() {
         <PortionForm
           food={state.food}
           persisted={state.persisted}
+          day={selectedDay}
           onFoodChange={(food) => setState({ kind: 'ready', food, persisted: true })}
           onSaved={() => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -144,6 +150,8 @@ export default function ProductScreen() {
           }}
         />
       )}
+
+      <NumericDoneBar />
     </KeyboardAvoidingView>
   );
 }
@@ -151,11 +159,13 @@ export default function ProductScreen() {
 type PortionFormProps = {
   food: FoodItem;
   persisted: boolean;
+  /** Tag, auf den der Eintrag gebucht wird; `null` bedeutet heute. */
+  day: Date | null;
   onFoodChange: (food: FoodItem) => void;
   onSaved: () => void;
 };
 
-function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProps) {
+function PortionForm({ food, persisted, day, onFoodChange, onSaved }: PortionFormProps) {
   const db = useSQLiteContext();
   const insets = useSafeAreaInsets();
   const [amount, setAmount] = useState('');
@@ -175,9 +185,14 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
     if (validGrams === null) return;
     setSaving(true);
     try {
+      // Erst das Produkt, dann der Eintrag: log_entry verweist per Fremdschlüssel darauf.
       if (!persisted) await saveFoodItem(db, food);
-      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType, per100g });
+      // Datum des gewählten Tages, Uhrzeit von jetzt.
+      const at = day ? combineDayWithTime(day, new Date()) : undefined;
+      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType, per100g, at });
       onSaved();
+    } catch {
+      Alert.alert('Speichern fehlgeschlagen', 'Der Eintrag konnte nicht gespeichert werden. Bitte versuche es erneut.');
     } finally {
       setSaving(false);
     }
@@ -205,6 +220,8 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
             await restoreFoodFromOpenFoodFacts(db, result.product);
             const updated = await getFoodItem(db, food.barcode);
             if (updated) onFoodChange(updated);
+          } catch {
+            Alert.alert('Wiederherstellen fehlgeschlagen', 'Bitte versuche es erneut.');
           } finally {
             setRestoring(false);
           }
@@ -215,7 +232,7 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <View style={styles.productRow}>
           {food.imageUrl ? (
             <Image source={{ uri: food.imageUrl }} style={styles.productImage} resizeMode="contain" />
@@ -228,30 +245,40 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
             <Text style={styles.productName} numberOfLines={2}>
               {food.name}
             </Text>
-            {food.brand ? <Text style={styles.muted}>{food.brand}</Text> : null}
+            {food.brand ? (
+              <Text style={styles.muted} numberOfLines={2}>
+                {food.brand}
+              </Text>
+            ) : null}
             <Text style={styles.per100}>
               pro 100 g: {formatInt(food.caloriesPer100g)} kcal · P {formatDecimal(food.proteinPer100g)} · K{' '}
               {formatDecimal(food.carbsPer100g)} · F {formatDecimal(food.fatPer100g)}
             </Text>
-            <View style={styles.nutrientActions}>
-              {food.userEdited && (
+            {food.userEdited && (
+              <View style={styles.nutrientActions}>
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>Eigene Werte</Text>
                 </View>
-              )}
-              {!correcting && (
-                <Text style={styles.link} onPress={() => setCorrecting(true)} accessibilityRole="button">
-                  Nährwerte korrigieren
-                </Text>
-              )}
-            </View>
-            {canRestore && !correcting && (
-              <Text style={[styles.link, styles.restoreLink]} onPress={restoring ? undefined : restore} accessibilityRole="button">
-                {restoring ? 'Wird geladen …' : 'Werte von Open Food Facts wiederherstellen'}
-              </Text>
+              </View>
             )}
           </View>
         </View>
+
+        <PrimaryButton
+          label={correcting ? 'Nährwerte ausblenden' : 'Nährwerte korrigieren'}
+          variant="secondary"
+          icon="pencil"
+          trailingIcon={correcting ? 'chevronUp' : 'chevronDown'}
+          expanded={correcting}
+          onPress={() => setCorrecting((open) => !open)}
+          style={styles.correctButton}
+        />
+
+        {canRestore && !correcting && (
+          <Text style={[styles.link, styles.restoreLink]} onPress={restoring ? undefined : restore} accessibilityRole="button">
+            {restoring ? 'Wird geladen …' : 'Werte von Open Food Facts wiederherstellen'}
+          </Text>
+        )}
 
         {correcting && (
           <CorrectionPanel
@@ -268,6 +295,7 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
 
         <View style={styles.amountRow}>
           <TextInput
+            {...numericAccessoryProps}
             value={amount}
             onChangeText={setAmount}
             keyboardType="decimal-pad"
@@ -338,6 +366,8 @@ function CorrectionPanel({ food, persisted, portionGrams, onCancel, onSaved }: C
       await updateFoodNutrients(db, food.barcode, { per100g: editor.per100g, name: name.trim(), brand: brand.trim() });
       const updated = await getFoodItem(db, food.barcode);
       if (updated) onSaved(updated);
+    } catch {
+      Alert.alert('Speichern fehlgeschlagen', 'Die Korrektur konnte nicht gespeichert werden. Bitte versuche es erneut.');
     } finally {
       setSaving(false);
     }
@@ -408,6 +438,8 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
       };
       await saveFoodItem(db, food);
       onSaved(asUnsaved(food));
+    } catch {
+      Alert.alert('Speichern fehlgeschlagen', 'Das Lebensmittel konnte nicht gespeichert werden. Bitte versuche es erneut.');
     } finally {
       setSaving(false);
     }
@@ -415,7 +447,7 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag">
         <Text style={styles.reason}>{REASON_TEXT[reason]}</Text>
         {reason === 'error' && (
           <PrimaryButton label="Erneut versuchen" variant="secondary" onPress={onRetry} style={{ marginBottom: spacing.md }} />
@@ -450,6 +482,9 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
   );
 }
 
+const AMOUNT_FONT_SIZE = 52;
+const AMOUNT_LINE_HEIGHT = 62;
+
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   header: {
@@ -473,20 +508,26 @@ const styles = StyleSheet.create({
   badge: { backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
   badgeText: { fontSize: 11, fontWeight: '600', color: colors.textMuted },
   link: { fontSize: 13, fontWeight: '600', color: colors.primary },
-  restoreLink: { marginTop: 6 },
+  restoreLink: { marginTop: spacing.sm, marginBottom: spacing.sm },
+  correctButton: { marginBottom: spacing.md },
   panel: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.lg },
   panelHint: { fontSize: 13, color: colors.textMuted, marginBottom: spacing.md, lineHeight: 18 },
-  amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center' },
+  // Wie im Eintrag-Fenster: feste Zeilenhöhe, damit die Ziffern im Feld bleiben.
+  amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center', height: AMOUNT_LINE_HEIGHT },
   amountInput: {
-    fontSize: 64,
+    fontSize: AMOUNT_FONT_SIZE,
+    lineHeight: AMOUNT_LINE_HEIGHT,
+    height: AMOUNT_LINE_HEIGHT,
     fontWeight: '800',
     color: colors.text,
-    minWidth: 120,
+    minWidth: 110,
+    maxWidth: 220,
     textAlign: 'right',
     fontVariant: ['tabular-nums'],
     paddingVertical: 0,
+    includeFontPadding: false,
   },
-  amountUnit: { fontSize: 32, fontWeight: '700', color: colors.textMuted, marginLeft: 8 },
+  amountUnit: { fontSize: 28, fontWeight: '700', color: colors.textMuted, marginLeft: 8 },
   totals: { alignItems: 'center', marginTop: spacing.sm, marginBottom: spacing.lg },
   totalKcal: { fontSize: 24, fontWeight: '800', color: colors.primary, fontVariant: ['tabular-nums'] },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },

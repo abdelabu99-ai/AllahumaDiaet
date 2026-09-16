@@ -1,11 +1,12 @@
 import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Linking, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '../components/Icon';
+import { NumericDoneBar, numericAccessoryProps } from '../components/NumericDoneBar';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { normalizeBarcode } from '../lib/barcode';
 import { colors, radius, spacing } from '../theme';
@@ -15,6 +16,8 @@ const BOX_HEIGHT = 180;
 
 export default function Scanner() {
   const router = useRouter();
+  // Tag, auf den der Eintrag gehört (aus der Startseite); fehlt er, gilt heute.
+  const { date } = useLocalSearchParams<{ date?: string }>();
   const insets = useSafeAreaInsets();
   const [permission, requestPermission] = useCameraPermissions();
   const [torch, setTorch] = useState(false);
@@ -28,7 +31,7 @@ export default function Scanner() {
   const openProduct = (barcode: string) => {
     handled.current = true;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.replace({ pathname: '/product/[barcode]', params: { barcode } });
+    router.replace({ pathname: '/product/[barcode]', params: { barcode, ...(date ? { date } : null) } });
   };
 
   const handleScan = ({ data }: BarcodeScanningResult) => {
@@ -72,7 +75,7 @@ export default function Scanner() {
           <PrimaryButton label="Einstellungen öffnen" onPress={() => Linking.openSettings()} />
         )}
         <PrimaryButton label="Nummer eintippen" variant="secondary" onPress={() => setManualOpen(true)} style={{ marginTop: spacing.sm }} />
-        <PrimaryButton label="Stattdessen suchen" variant="secondary" onPress={() => router.replace('/search')} style={{ marginTop: spacing.sm }} />
+        <PrimaryButton label="Stattdessen suchen" variant="secondary" onPress={() => router.replace({ pathname: '/search', params: date ? { date } : {} })} style={{ marginTop: spacing.sm }} />
         <PrimaryButton label="Abbrechen" variant="secondary" onPress={() => router.back()} style={{ marginTop: spacing.sm }} />
         {renderManualModal()}
       </View>
@@ -86,6 +89,7 @@ export default function Scanner() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Barcode-Nummer eingeben</Text>
             <TextInput
+              {...numericAccessoryProps}
               value={manualCode}
               onChangeText={(t) => {
                 setManualCode(t.replace(/\D/g, ''));
@@ -103,6 +107,7 @@ export default function Scanner() {
             <PrimaryButton label="Suchen" onPress={submitManual} disabled={manualCode.length < 8} />
             <PrimaryButton label="Abbrechen" variant="secondary" onPress={() => setManualOpen(false)} style={{ marginTop: spacing.sm }} />
           </View>
+          <NumericDoneBar />
         </KeyboardAvoidingView>
       </Modal>
     );
@@ -151,7 +156,7 @@ export default function Scanner() {
           <Icon name="keyboard" color="#fff" size={22} />
           <Text style={styles.manualLabel}>Nummer eintippen</Text>
         </Pressable>
-        <Pressable onPress={() => router.replace('/search')} hitSlop={8} style={styles.searchLink} accessibilityRole="link">
+        <Pressable onPress={() => router.replace({ pathname: '/search', params: date ? { date } : {} })} hitSlop={8} style={styles.searchLink} accessibilityRole="link">
           <Text style={styles.searchLinkText}>Stattdessen suchen</Text>
         </Pressable>
       </View>

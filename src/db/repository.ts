@@ -356,6 +356,16 @@ export async function getEntriesForDate(db: SQLiteDatabase, date: string): Promi
   return rows.map(toLogEntry);
 }
 
+/** Tage mit mindestens einem Eintrag im angegebenen Bereich (Schlüssel wie „2026-09-16“). */
+export async function getDatesWithEntries(db: SQLiteDatabase, fromDate: string, toDate: string): Promise<string[]> {
+  const rows = await db.getAllAsync<{ date: string }>(
+    'SELECT DISTINCT date FROM log_entry WHERE date BETWEEN ? AND ? ORDER BY date',
+    fromDate,
+    toDate,
+  );
+  return rows.map((row) => row.date);
+}
+
 /** Ändert nur die übergebenen Felder eines Eintrags. Das Lebensmittel selbst bleibt unberührt. */
 export async function updateLogEntry(
   db: SQLiteDatabase,

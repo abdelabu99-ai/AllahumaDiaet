@@ -1,5 +1,5 @@
 import { randomUUID } from 'expo-crypto';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -65,6 +65,8 @@ export default function SearchScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  // Tag, auf den ausgewählte Lebensmittel gebucht werden (aus der Startseite).
+  const { date } = useLocalSearchParams<{ date?: string }>();
 
   const [query, setQuery] = useState('');
   const [recent, setRecent] = useState<FoodItem[]>([]);
@@ -149,7 +151,8 @@ export default function SearchScreen() {
     });
   };
 
-  const openFood = (key: string) => router.push({ pathname: '/product/[barcode]', params: { barcode: key } });
+  const openFood = (key: string) =>
+    router.push({ pathname: '/product/[barcode]', params: { barcode: key, ...(date ? { date } : null) } });
 
   const openHit = (hit: SearchHit) => {
     const key = hitKey(hit);
@@ -158,7 +161,10 @@ export default function SearchScreen() {
   };
 
   const createCustomFood = () => {
-    router.push({ pathname: '/product/[barcode]', params: { barcode: newCustomFoodKey(randomUUID()), name: trimmed } });
+    router.push({
+      pathname: '/product/[barcode]',
+      params: { barcode: newCustomFoodKey(randomUUID()), name: trimmed, ...(date ? { date } : null) },
+    });
   };
 
   const rows = useMemo<Row[]>(() => {
