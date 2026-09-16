@@ -94,8 +94,12 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
         text: 'Löschen',
         style: 'destructive',
         onPress: async () => {
-          await deleteLogEntry(db, entry.id);
-          router.back();
+          try {
+            await deleteLogEntry(db, entry.id);
+            router.back();
+          } catch {
+            Alert.alert('Löschen fehlgeschlagen', 'Bitte versuche es erneut.');
+          }
         },
       },
     ]);

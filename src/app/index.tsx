@@ -53,8 +53,12 @@ export default function Dashboard() {
         text: 'Löschen',
         style: 'destructive',
         onPress: async () => {
-          await deleteLogEntry(db, entry.id);
-          load();
+          try {
+            await deleteLogEntry(db, entry.id);
+            load();
+          } catch {
+            Alert.alert('Löschen fehlgeschlagen', 'Bitte versuche es erneut.');
+          }
         },
       },
     ]);

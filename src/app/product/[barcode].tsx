@@ -35,6 +35,7 @@ import {
   type NewFoodItem,
 } from '../../db/repository';
 import { isCustomFoodKey, parseFoodKey } from '../../lib/foodKey';
+import { chooseFoodSource } from '../../lib/foodSource';
 import { defaultMealType, formatDecimal, formatInt, MEAL_TYPES, parseDecimal, toInputText, type MealType } from '../../lib/format';
 import { nutrientsForPortion } from '../../lib/nutrition';
 import { fetchProduct, type PartialProduct } from '../../lib/openFoodFacts';
@@ -69,9 +70,9 @@ export default function ProductScreen() {
     }
     setState({ kind: 'loading' });
 
-    // Zuerst lokal: schnell und funktioniert auch ohne Internet im Supermarkt.
+    // Zuerst lokal: schnell, offline nutzbar und korrigierte Werte gewinnen (chooseFoodSource).
     const local = await getFoodItem(db, foodKey);
-    if (local) {
+    if (chooseFoodSource({ local, remote: 'missing' }) === 'local' && local) {
       setState({ kind: 'ready', food: local, persisted: true });
       return;
     }
@@ -178,9 +179,12 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
     if (validGrams === null) return;
     setSaving(true);
     try {
+      // Erst das Produkt, dann der Eintrag: log_entry verweist per Fremdschlüssel darauf.
       if (!persisted) await saveFoodItem(db, food);
       await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType, per100g });
       onSaved();
+    } catch {
+      Alert.alert('Speichern fehlgeschlagen', 'Der Eintrag konnte nicht gespeichert werden. Bitte versuche es erneut.');
     } finally {
       setSaving(false);
     }
@@ -208,6 +212,8 @@ function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProp
             await restoreFoodFromOpenFoodFacts(db, result.product);
             const updated = await getFoodItem(db, food.barcode);
             if (updated) onFoodChange(updated);
+          } catch {
+            Alert.alert('Wiederherstellen fehlgeschlagen', 'Bitte versuche es erneut.');
           } finally {
             setRestoring(false);
           }
@@ -352,6 +358,8 @@ function CorrectionPanel({ food, persisted, portionGrams, onCancel, onSaved }: C
       await updateFoodNutrients(db, food.barcode, { per100g: editor.per100g, name: name.trim(), brand: brand.trim() });
       const updated = await getFoodItem(db, food.barcode);
       if (updated) onSaved(updated);
+    } catch {
+      Alert.alert('Speichern fehlgeschlagen', 'Die Korrektur konnte nicht gespeichert werden. Bitte versuche es erneut.');
     } finally {
       setSaving(false);
     }
@@ -422,6 +430,8 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
       };
       await saveFoodItem(db, food);
       onSaved(asUnsaved(food));
+    } catch {
+      Alert.alert('Speichern fehlgeschlagen', 'Das Lebensmittel konnte nicht gespeichert werden. Bitte versuche es erneut.');
     } finally {
       setSaving(false);
     }
