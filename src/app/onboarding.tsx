@@ -203,8 +203,8 @@ export default function Onboarding() {
         <PrimaryButton label="Speichern" onPress={handleSave} disabled={!canSave} loading={saving} />
 
         <Text style={styles.note}>
-          Alle Angaben bleiben ausschließlich auf deinem Gerät. Es gibt kein Konto und keine Werbung. Beim Scannen wird nur der
-          Barcode an Open Food Facts gesendet, um das Produkt zu finden.
+          Alle Angaben bleiben ausschließlich auf deinem Gerät. Es gibt kein Konto und keine Werbung. Beim Scannen und bei der
+          Online-Suche wird nur der Barcode bzw. Suchbegriff an Open Food Facts gesendet, um das Produkt zu finden.
         </Text>
         <Text style={styles.note}>Die Berechnung ist ein Richtwert und ersetzt keine ärztliche Beratung.</Text>
         {hasProfile && (

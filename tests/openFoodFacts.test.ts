@@ -5,7 +5,7 @@ import { buildUserAgent, parseProduct } from '../src/lib/openFoodFacts.ts';
 
 describe('buildUserAgent', () => {
   it('nennt App, Version und Kontakt', () => {
-    assert.equal(buildUserAgent('HALABI', '1.0.0', 'kontakt@example.com'), 'HALABI/1.0.0 (kontakt@example.com)');
+    assert.equal(buildUserAgent('AllahumaDiaet', '1.0.0', 'kontakt@example.com'), 'AllahumaDiaet/1.0.0 (kontakt@example.com)');
   });
 });
 

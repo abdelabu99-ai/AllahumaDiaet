@@ -4,6 +4,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -20,62 +21,83 @@ import { USER_AGENT } from '../../appInfo';
 import { Chip } from '../../components/Chip';
 import { Icon } from '../../components/Icon';
 import { LabeledInput } from '../../components/LabeledInput';
+import { NutritionFields, useNutritionEditor } from '../../components/NutritionFields';
 import { PrimaryButton } from '../../components/PrimaryButton';
-import { addLogEntry, getFoodItem, saveFoodItem, type FoodItem } from '../../db/repository';
-import { normalizeBarcode } from '../../lib/barcode';
+import {
+  addLogEntry,
+  foodPer100g,
+  getFoodItem,
+  restoreFoodFromOpenFoodFacts,
+  saveFoodItem,
+  updateFoodNutrients,
+  type FoodItem,
+  type NewFoodItem,
+} from '../../db/repository';
+import { isCustomFoodKey, parseFoodKey } from '../../lib/foodKey';
 import { defaultMealType, formatDecimal, formatInt, MEAL_TYPES, parseDecimal, toInputText, type MealType } from '../../lib/format';
 import { nutrientsForPortion } from '../../lib/nutrition';
 import { fetchProduct, type PartialProduct } from '../../lib/openFoodFacts';
+import { portionPresets, validPortionGrams } from '../../lib/portions';
+import { getSearchHit } from '../../lib/searchHandoff';
 import { colors, radius, spacing } from '../../theme';
 
 type ScreenState =
   | { kind: 'loading' }
   | { kind: 'invalid' }
-  | { kind: 'ready'; food: FoodItem }
-  | { kind: 'manual'; reason: 'not_found' | 'incomplete' | 'error'; prefill: PartialProduct | null };
+  /** `persisted: false` = Daten von Open Food Facts, noch nicht in food_item gespeichert. */
+  | { kind: 'ready'; food: FoodItem; persisted: boolean }
+  | { kind: 'manual'; reason: 'not_found' | 'incomplete' | 'error' | 'custom'; prefill: PartialProduct | null };
 
-const MAX_PORTION_G = 5000;
+const asUnsaved = (item: NewFoodItem): FoodItem => ({ ...item, userEdited: false, updatedAt: null });
 
 export default function ProductScreen() {
   const db = useSQLiteContext();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ barcode: string }>();
-  const barcode = normalizeBarcode(String(params.barcode ?? ''));
+  // `barcode` ist eine GTIN oder ein `custom:`-Schlüssel; `name` füllt ein neues eigenes Lebensmittel vor.
+  const params = useLocalSearchParams<{ barcode: string; name?: string }>();
+  const foodKey = parseFoodKey(String(params.barcode ?? ''));
+  const initialName = typeof params.name === 'string' ? params.name : '';
 
   const [state, setState] = useState<ScreenState>({ kind: 'loading' });
 
   const lookup = useCallback(async () => {
-    if (!barcode) {
+    if (!foodKey) {
       setState({ kind: 'invalid' });
       return;
     }
     setState({ kind: 'loading' });
 
     // Zuerst lokal: schnell und funktioniert auch ohne Internet im Supermarkt.
-    const local = await getFoodItem(db, barcode);
+    const local = await getFoodItem(db, foodKey);
     if (local) {
-      setState({ kind: 'ready', food: local });
+      setState({ kind: 'ready', food: local, persisted: true });
       return;
     }
 
-    const result = await fetchProduct(barcode, USER_AGENT);
+    if (isCustomFoodKey(foodKey)) {
+      const prefill = { barcode: foodKey, name: initialName, brand: '', servingSizeG: null, imageUrl: null };
+      setState({ kind: 'manual', reason: 'custom', prefill });
+      return;
+    }
+
+    // Aus der Online-Suche übernommen: kein zweiter Abruf, noch nichts in der Datenbank.
+    const result = getSearchHit(foodKey) ?? (await fetchProduct(foodKey, USER_AGENT));
     if (result.status === 'found') {
-      const food: FoodItem = { ...result.product, source: 'openfoodfacts' };
-      await saveFoodItem(db, food);
-      setState({ kind: 'ready', food });
+      // Erst beim Speichern des Eintrags (oder einer Korrektur) landet das Produkt in food_item.
+      setState({ kind: 'ready', food: asUnsaved({ ...result.product, source: 'openfoodfacts' }), persisted: false });
     } else if (result.status === 'incomplete') {
       setState({ kind: 'manual', reason: 'incomplete', prefill: result.partial });
     } else {
       setState({ kind: 'manual', reason: result.status, prefill: null });
     }
-  }, [db, barcode]);
+  }, [db, foodKey, initialName]);
 
   useEffect(() => {
     lookup();
   }, [lookup]);
 
-  const title = state.kind === 'manual' ? 'Nährwerte eingeben' : 'Eintragen';
+  const title = state.kind === 'manual' ? (state.reason === 'custom' ? 'Eigenes Lebensmittel' : 'Nährwerte eingeben') : 'Eintragen';
 
   return (
     <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -101,19 +123,21 @@ export default function ProductScreen() {
         </View>
       )}
 
-      {state.kind === 'manual' && barcode && (
+      {state.kind === 'manual' && foodKey && (
         <ManualEntryForm
-          barcode={barcode}
+          barcode={foodKey}
           reason={state.reason}
           prefill={state.prefill}
           onRetry={lookup}
-          onSaved={(food) => setState({ kind: 'ready', food })}
+          onSaved={(food) => setState({ kind: 'ready', food, persisted: true })}
         />
       )}
 
       {state.kind === 'ready' && (
         <PortionForm
           food={state.food}
+          persisted={state.persisted}
+          onFoodChange={(food) => setState({ kind: 'ready', food, persisted: true })}
           onSaved={() => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             router.dismissTo('/');
@@ -124,36 +148,69 @@ export default function ProductScreen() {
   );
 }
 
-function PortionForm({ food, onSaved }: { food: FoodItem; onSaved: () => void }) {
+type PortionFormProps = {
+  food: FoodItem;
+  persisted: boolean;
+  onFoodChange: (food: FoodItem) => void;
+  onSaved: () => void;
+};
+
+function PortionForm({ food, persisted, onFoodChange, onSaved }: PortionFormProps) {
   const db = useSQLiteContext();
   const insets = useSafeAreaInsets();
   const [amount, setAmount] = useState('');
   const [mealType, setMealType] = useState<MealType>(() => defaultMealType(new Date()));
   const [saving, setSaving] = useState(false);
+  const [correcting, setCorrecting] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   const grams = parseDecimal(amount);
-  const validGrams = grams !== null && grams > 0 && grams <= MAX_PORTION_G ? grams : null;
-  const portion = nutrientsForPortion(
-    { calories: food.caloriesPer100g, protein: food.proteinPer100g, carbs: food.carbsPer100g, fat: food.fatPer100g },
-    validGrams ?? 0,
-  );
-
-  const presets: { label: string; grams: number }[] = [
-    ...(food.servingSizeG ? [{ label: `1 Packung (${formatDecimal(food.servingSizeG)} g)`, grams: food.servingSizeG }] : []),
-    { label: '100 g', grams: 100 },
-    { label: '1 Esslöffel (15 g)', grams: 15 },
-    { label: '1 Teelöffel (5 g)', grams: 5 },
-  ];
+  const validGrams = validPortionGrams(grams);
+  const per100g = foodPer100g(food);
+  const portion = nutrientsForPortion(per100g, validGrams ?? 0);
+  const canRestore = food.userEdited && !isCustomFoodKey(food.barcode);
+  const presets = portionPresets(food.servingSizeG);
 
   const save = async () => {
     if (validGrams === null) return;
     setSaving(true);
     try {
-      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType });
+      if (!persisted) await saveFoodItem(db, food);
+      await addLogEntry(db, { barcode: food.barcode, grams: validGrams, mealType, per100g });
       onSaved();
     } finally {
       setSaving(false);
     }
+  };
+
+  const restore = () => {
+    Alert.alert('Eigene Werte verwerfen?', 'Die Nährwerte werden neu von Open Food Facts geladen.', [
+      { text: 'Abbrechen', style: 'cancel' },
+      {
+        text: 'Wiederherstellen',
+        onPress: async () => {
+          setRestoring(true);
+          try {
+            const result = await fetchProduct(food.barcode, USER_AGENT);
+            if (result.status !== 'found') {
+              const message =
+                result.status === 'error'
+                  ? 'Keine Verbindung zu Open Food Facts. Bitte versuche es später erneut.'
+                  : result.status === 'incomplete'
+                    ? 'Bei Open Food Facts fehlen Nährwerte für dieses Produkt. Deine eigenen Werte bleiben erhalten.'
+                    : 'Open Food Facts kennt dieses Produkt nicht. Deine eigenen Werte bleiben erhalten.';
+              Alert.alert('Wiederherstellen nicht möglich', message);
+              return;
+            }
+            await restoreFoodFromOpenFoodFacts(db, result.product);
+            const updated = await getFoodItem(db, food.barcode);
+            if (updated) onFoodChange(updated);
+          } finally {
+            setRestoring(false);
+          }
+        },
+      },
+    ]);
   };
 
   return (
@@ -176,8 +233,38 @@ function PortionForm({ food, onSaved }: { food: FoodItem; onSaved: () => void })
               pro 100 g: {formatInt(food.caloriesPer100g)} kcal · P {formatDecimal(food.proteinPer100g)} · K{' '}
               {formatDecimal(food.carbsPer100g)} · F {formatDecimal(food.fatPer100g)}
             </Text>
+            <View style={styles.nutrientActions}>
+              {food.userEdited && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>Eigene Werte</Text>
+                </View>
+              )}
+              {!correcting && (
+                <Text style={styles.link} onPress={() => setCorrecting(true)} accessibilityRole="button">
+                  Nährwerte korrigieren
+                </Text>
+              )}
+            </View>
+            {canRestore && !correcting && (
+              <Text style={[styles.link, styles.restoreLink]} onPress={restoring ? undefined : restore} accessibilityRole="button">
+                {restoring ? 'Wird geladen …' : 'Werte von Open Food Facts wiederherstellen'}
+              </Text>
+            )}
           </View>
         </View>
+
+        {correcting && (
+          <CorrectionPanel
+            food={food}
+            persisted={persisted}
+            portionGrams={validGrams}
+            onCancel={() => setCorrecting(false)}
+            onSaved={(updated) => {
+              setCorrecting(false);
+              onFoodChange(updated);
+            }}
+          />
+        )}
 
         <View style={styles.amountRow}>
           <TextInput
@@ -205,12 +292,7 @@ function PortionForm({ food, onSaved }: { food: FoodItem; onSaved: () => void })
 
         <View style={styles.chips}>
           {presets.map((preset) => (
-            <Chip
-              key={preset.label}
-              label={preset.label}
-              selected={grams === preset.grams}
-              onPress={() => setAmount(toInputText(preset.grams))}
-            />
+            <Chip key={preset.label} label={preset.label} selected={grams === preset.grams} onPress={() => setAmount(toInputText(preset.grams))} />
           ))}
         </View>
 
@@ -221,10 +303,56 @@ function PortionForm({ food, onSaved }: { food: FoodItem; onSaved: () => void })
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.sm }]}>
-        <PrimaryButton label="Speichern" onPress={save} disabled={validGrams === null} loading={saving} />
-      </View>
+      {!correcting && (
+        <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.sm }]}>
+          <PrimaryButton label="Speichern" onPress={save} disabled={validGrams === null} loading={saving} />
+        </View>
+      )}
     </>
+  );
+}
+
+type CorrectionPanelProps = {
+  food: FoodItem;
+  persisted: boolean;
+  portionGrams: number | null;
+  onCancel: () => void;
+  onSaved: (food: FoodItem) => void;
+};
+
+function CorrectionPanel({ food, persisted, portionGrams, onCancel, onSaved }: CorrectionPanelProps) {
+  const db = useSQLiteContext();
+  const [name, setName] = useState(food.name);
+  const [brand, setBrand] = useState(food.brand);
+  const [saving, setSaving] = useState(false);
+  const editor = useNutritionEditor({ initialPer100g: foodPer100g(food), portionGrams });
+
+  const canSave = name.trim() !== '' && editor.isValid && !saving;
+
+  const save = async () => {
+    if (!canSave || !editor.per100g) return;
+    setSaving(true);
+    try {
+      // Stammt das Produkt frisch von Open Food Facts, erst anlegen, dann als korrigiert markieren.
+      if (!persisted) await saveFoodItem(db, food);
+      await updateFoodNutrients(db, food.barcode, { per100g: editor.per100g, name: name.trim(), brand: brand.trim() });
+      const updated = await getFoodItem(db, food.barcode);
+      if (updated) onSaved(updated);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <View style={styles.panel}>
+      <Text style={styles.sectionLabel}>Nährwerte korrigieren</Text>
+      <LabeledInput label="Name" keyboardType="default" value={name} onChangeText={setName} />
+      <LabeledInput label="Marke (optional)" keyboardType="default" value={brand} onChangeText={setBrand} />
+      <NutritionFields editor={editor} />
+      <Text style={styles.panelHint}>Gilt ab jetzt für dieses Produkt. Bereits eingetragene Tage bleiben unverändert.</Text>
+      <PrimaryButton label="Korrektur speichern" onPress={save} disabled={!canSave} loading={saving} />
+      <PrimaryButton label="Abbrechen" variant="secondary" onPress={onCancel} style={{ marginTop: spacing.sm }} />
+    </View>
   );
 }
 
@@ -232,6 +360,7 @@ const REASON_TEXT = {
   not_found: 'Dieses Produkt ist noch nicht in der Datenbank. Gib die Nährwerte einmalig ein – beim nächsten Scan sind sie sofort da.',
   incomplete: 'Für dieses Produkt fehlen Nährwerte. Bitte ergänze sie einmalig von der Verpackung.',
   error: 'Keine Verbindung zur Produktdatenbank. Du kannst es erneut versuchen oder die Nährwerte von der Verpackung eintippen.',
+  custom: 'Lege ein eigenes Lebensmittel ohne Barcode an. Es wird auf deinem Gerät gespeichert und ist über die Suche wieder auffindbar.',
 } as const;
 
 type ManualProps = {
@@ -247,53 +376,38 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
   const insets = useSafeAreaInsets();
   const [name, setName] = useState(prefill?.name ?? '');
   const [brand, setBrand] = useState(prefill?.brand ?? '');
-  const [kcal, setKcal] = useState('');
-  const [protein, setProtein] = useState('');
-  const [carbs, setCarbs] = useState('');
-  const [fat, setFat] = useState('');
   const [packageSize, setPackageSize] = useState(prefill?.servingSizeG ? toInputText(prefill.servingSizeG) : '');
   const [saving, setSaving] = useState(false);
 
-  const kcalValue = parseDecimal(kcal);
-  const proteinValue = parseDecimal(protein);
-  const carbsValue = parseDecimal(carbs);
-  const fatValue = parseDecimal(fat);
   const packageValue = parseDecimal(packageSize);
-
-  const kcalError = kcalValue !== null && kcalValue > 900 ? 'Mehr als 900 kcal pro 100 g ist nicht möglich.' : null;
-  const macroSum = (proteinValue ?? 0) + (carbsValue ?? 0) + (fatValue ?? 0);
-  const macroError = macroSum > 100 ? 'Protein, Kohlenhydrate und Fett zusammen können nicht über 100 g liegen.' : null;
   const packageError = packageSize.trim() !== '' && (packageValue === null || packageValue <= 0) ? 'Ungültige Menge.' : null;
+  // Viele Etiketten nennen Werte pro Packung oder Portion – die Packungsgröße dient dann als Umrechnungsbasis.
+  const editor = useNutritionEditor({
+    initialPer100g: null,
+    portionGrams: packageValue !== null && packageValue > 0 ? packageValue : null,
+    portionLabel: 'pro Packung',
+  });
 
-  const canSave =
-    name.trim() !== '' &&
-    kcalValue !== null &&
-    proteinValue !== null &&
-    carbsValue !== null &&
-    fatValue !== null &&
-    !kcalError &&
-    !macroError &&
-    !packageError &&
-    !saving;
+  const canSave = name.trim() !== '' && editor.isValid && !packageError && !saving;
 
   const save = async () => {
-    if (!canSave || kcalValue === null || proteinValue === null || carbsValue === null || fatValue === null) return;
+    if (!canSave || !editor.per100g) return;
     setSaving(true);
     try {
-      const food: FoodItem = {
+      const food: NewFoodItem = {
         barcode,
         name: name.trim(),
         brand: brand.trim(),
-        caloriesPer100g: Math.round(kcalValue),
-        proteinPer100g: proteinValue,
-        carbsPer100g: carbsValue,
-        fatPer100g: fatValue,
+        caloriesPer100g: editor.per100g.calories,
+        proteinPer100g: editor.per100g.protein,
+        carbsPer100g: editor.per100g.carbs,
+        fatPer100g: editor.per100g.fat,
         servingSizeG: packageValue && packageValue > 0 ? packageValue : null,
         imageUrl: prefill?.imageUrl ?? null,
         source: 'manual',
       };
       await saveFoodItem(db, food);
-      onSaved(food);
+      onSaved(asUnsaved(food));
     } finally {
       setSaving(false);
     }
@@ -306,31 +420,31 @@ function ManualEntryForm({ barcode, reason, prefill, onRetry, onSaved }: ManualP
         {reason === 'error' && (
           <PrimaryButton label="Erneut versuchen" variant="secondary" onPress={onRetry} style={{ marginBottom: spacing.md }} />
         )}
-        <Text style={styles.barcode}>Barcode {barcode}</Text>
+        {!isCustomFoodKey(barcode) && <Text style={styles.barcode}>Barcode {barcode}</Text>}
 
-        <LabeledInput label="Produktname" keyboardType="default" value={name} onChangeText={setName} placeholder="z. B. Magerquark" autoFocus={!prefill?.name} />
+        <LabeledInput
+          label={reason === 'custom' ? 'Name' : 'Produktname'}
+          keyboardType="default"
+          value={name}
+          onChangeText={setName}
+          placeholder={reason === 'custom' ? 'z. B. Omas Linsensuppe' : 'z. B. Magerquark'}
+          autoFocus={!prefill?.name}
+        />
         <LabeledInput label="Marke (optional)" keyboardType="default" value={brand} onChangeText={setBrand} />
+        <LabeledInput
+          label={reason === 'custom' ? 'Übliche Portion (optional)' : 'Packungsgröße (optional)'}
+          unit="g"
+          value={packageSize}
+          onChangeText={setPackageSize}
+          error={packageError}
+        />
 
-        <Text style={styles.sectionLabel}>Nährwerte pro 100 g</Text>
-        <LabeledInput label="Kalorien" unit="kcal" value={kcal} onChangeText={setKcal} error={kcalError} autoFocus={Boolean(prefill?.name)} />
-        <View style={styles.macroRow}>
-          <View style={{ flex: 1 }}>
-            <LabeledInput label="Protein" unit="g" value={protein} onChangeText={setProtein} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <LabeledInput label="Kohlenh." unit="g" value={carbs} onChangeText={setCarbs} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <LabeledInput label="Fett" unit="g" value={fat} onChangeText={setFat} />
-          </View>
-        </View>
-        {macroError && <Text style={styles.error}>{macroError}</Text>}
-
-        <LabeledInput label="Packungsgröße (optional)" unit="g" value={packageSize} onChangeText={setPackageSize} error={packageError} />
+        <Text style={styles.sectionLabel}>Nährwerte</Text>
+        <NutritionFields editor={editor} autoFocus={Boolean(prefill?.name)} />
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.sm }]}>
-        <PrimaryButton label="Produkt speichern" onPress={save} disabled={!canSave} loading={saving} />
+        <PrimaryButton label={reason === 'custom' ? 'Lebensmittel speichern' : 'Produkt speichern'} onPress={save} disabled={!canSave} loading={saving} />
       </View>
     </>
   );
@@ -350,11 +464,18 @@ const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg, gap: spacing.sm },
   content: { padding: spacing.md, paddingBottom: spacing.lg },
   muted: { fontSize: 14, color: colors.textMuted },
-  productRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'center', marginBottom: spacing.lg },
+  productRow: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start', marginBottom: spacing.lg },
   productImage: { width: 72, height: 72, borderRadius: radius.md, backgroundColor: colors.surface },
   imagePlaceholder: { alignItems: 'center', justifyContent: 'center' },
   productName: { fontSize: 20, fontWeight: '700', color: colors.text },
   per100: { fontSize: 12, color: colors.textMuted, marginTop: 4 },
+  nutrientActions: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm, marginTop: 6 },
+  badge: { backgroundColor: colors.background, borderRadius: radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
+  badgeText: { fontSize: 11, fontWeight: '600', color: colors.textMuted },
+  link: { fontSize: 13, fontWeight: '600', color: colors.primary },
+  restoreLink: { marginTop: 6 },
+  panel: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.lg },
+  panelHint: { fontSize: 13, color: colors.textMuted, marginBottom: spacing.md, lineHeight: 18 },
   amountRow: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'center' },
   amountInput: {
     fontSize: 64,
@@ -379,6 +500,4 @@ const styles = StyleSheet.create({
   reason: { fontSize: 15, color: colors.text, lineHeight: 21, marginBottom: spacing.md },
   barcode: { fontSize: 13, color: colors.textMuted, marginBottom: spacing.md, fontVariant: ['tabular-nums'] },
   sectionLabel: { fontSize: 16, fontWeight: '700', color: colors.text, marginTop: spacing.sm, marginBottom: spacing.sm },
-  macroRow: { flexDirection: 'row', gap: spacing.sm },
-  error: { fontSize: 13, color: colors.danger, marginTop: -6, marginBottom: spacing.sm },
 });

@@ -4,6 +4,8 @@ Kalorientracker-App für iPhone und Android nach dem Prinzip „Scan & Go“: ö
 
 - Keine Werbung, kein Konto, keine Cloud: Alle Daten bleiben auf dem Gerät (SQLite).
 - Produktdaten kommen von [Open Food Facts](https://world.openfoodfacts.org) (ODbL). Unbekannte Produkte werden einmalig manuell erfasst und lokal gespeichert.
+- Alternativ zum Scanner: Suche mit „Zuletzt verwendet“, „Häufig gegessen“, lokalen Treffern, Online-Suche (nur beim Absenden, unter dem Rate Limit von Open Food Facts) und eigenen Lebensmitteln ohne Barcode.
+- Nährwerte lassen sich pro Produkt korrigieren; jeder Tagebucheintrag speichert einen eigenen Nährwert-Schnappschuss und kann einzeln bearbeitet werden.
 - Kalorienziel nach Mifflin-St. Jeor × PAL-Faktor, Makroverteilung frei einstellbar (Standard 50 % KH / 30 % Protein / 20 % Fett).
 
 ## Auf dem Handy testen
@@ -52,22 +54,31 @@ Die Profile stehen in `eas.json`:
 | `preview` | Release-Build zum Testen auf registrierten Geräten, interne Verteilung |
 | `production` | Build für den App Store; die Build-Nummer wird automatisch erhöht |
 
-Versionsnummern verwaltet EAS zentral (`cli.appVersionSource: "remote"`). Die sichtbare Version (`1.0.0`) steht weiterhin in `app.json` unter `version` und wird dort für jedes Update von Hand erhöht.
+### Versionen
 
-### Einmalig einrichten
+- **Sichtbare Version** (`1.0.0`): steht in `app.json` unter `version` und wird für jedes Update von Hand erhöht.
+- **Build-Nummer**: verwaltet EAS auf seinen Servern (`cli.appVersionSource: "remote"`), das Profil `production` erhöht sie bei jedem Build automatisch (`autoIncrement`). Ein `ios.buildNumber` oder `android.versionCode` in `app.json` wird deshalb **ignoriert** – bitte dort nicht eintragen.
+
+### Befehle in Reihenfolge
 
 ```bash
+# 1. EAS CLI installieren und anmelden (einmalig)
 npm install -g eas-cli
 eas login
+
+# 2. Projekt bei Expo anlegen; trägt extra.eas.projectId in app.json ein (danach slug nicht mehr ändern)
 eas init
-```
 
-`eas init` legt das Projekt bei Expo an und trägt `extra.eas.projectId` in `app.json` ein. Danach `slug` nicht mehr ändern.
+# 3. Nur falls eas.json fehlt: erzeugt die Datei. Hier liegt sie schon im Repository, der Schritt entfällt.
+eas build:configure
 
-### App Store
+# 4. Optional: letzte Build-Nummer übernehmen, falls die App schon einmal ohne EAS hochgeladen wurde
+eas build:version:set --platform ios
 
-```bash
+# 5. Build für den App Store in der Cloud erstellen
 eas build --platform ios --profile production
+
+# 6. ascAppId in eas.json eintragen (siehe unten), dann zu App Store Connect hochladen
 eas submit --platform ios --profile production
 ```
 

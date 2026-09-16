@@ -107,6 +107,73 @@ export function nutrientsForPortion(per100g: Nutrients, grams: number): Nutrient
   };
 }
 
+/**
+ * Gegenstück zu `nutrientsForPortion`: rechnet Nährwerte einer Portion auf 100 g hoch.
+ * Bewusst fein gerundet, damit dieselbe Portion anschließend wieder exakt dieselben Werte ergibt.
+ */
+export function portionToPer100g(portion: Nutrients, grams: number): Nutrients {
+  if (!Number.isFinite(grams) || grams <= 0) throw new RangeError('Die Portion muss mehr als 0 g haben.');
+  const factor = 100 / grams;
+  return {
+    calories: roundTo(portion.calories * factor, 0.0001),
+    protein: roundTo(portion.protein * factor, 0.0001),
+    carbs: roundTo(portion.carbs * factor, 0.0001),
+    fat: roundTo(portion.fat * factor, 0.0001),
+  };
+}
+
+export const MAX_KCAL_PER_100G = 900;
+export const MAX_MACROS_PER_100G = 100;
+
+export type NutrientValidation = {
+  calories: string | null;
+  protein: string | null;
+  carbs: string | null;
+  fat: string | null;
+  /** Fehler, der die Summe der Makros betrifft. */
+  macroTotal: string | null;
+  valid: boolean;
+};
+
+/** Harte Regeln für Nährwerte pro 100 g. Verstöße verhindern das Speichern. */
+export function validateNutrients(per100g: Nutrients): NutrientValidation {
+  const negative = (value: number) => (!Number.isFinite(value) || value < 0 ? 'Bitte einen Wert ab 0 eingeben.' : null);
+
+  const calories =
+    negative(per100g.calories) ??
+    (per100g.calories > MAX_KCAL_PER_100G ? `Mehr als ${MAX_KCAL_PER_100G} kcal pro 100 g ist nicht möglich.` : null);
+  const protein = negative(per100g.protein);
+  const carbs = negative(per100g.carbs);
+  const fat = negative(per100g.fat);
+
+  const macroSum = per100g.protein + per100g.carbs + per100g.fat;
+  const macroTotal =
+    !protein && !carbs && !fat && macroSum > MAX_MACROS_PER_100G
+      ? `Protein, Kohlenhydrate und Fett zusammen können nicht über ${MAX_MACROS_PER_100G} g pro 100 g liegen.`
+      : null;
+
+  return { calories, protein, carbs, fat, macroTotal, valid: !calories && !protein && !carbs && !fat && !macroTotal };
+}
+
+/**
+ * Ab dieser relativen Abweichung zwischen angegebenen kcal und 4·P + 4·K + 9·F wird gewarnt.
+ * Die Formel ist nur eine Näherung: Ballaststoffe (ca. 2 kcal/g, auf EU-Etiketten nicht in den
+ * Kohlenhydraten enthalten), Alkohol (7 kcal/g) und Zuckeralkohole bringen Energie ohne Makro-Anteil.
+ * Deshalb nur ein Hinweis, kein Fehler.
+ */
+export const PLAUSIBILITY_TOLERANCE = 0.2;
+/** Kleine absolute Abweichungen (z. B. Tee mit 1 kcal) sind kein Grund für eine Warnung. */
+export const PLAUSIBILITY_MIN_DIFF_KCAL = 15;
+
+export function plausibilityWarning(per100g: Nutrients): string | null {
+  if (!validateNutrients(per100g).valid) return null;
+  const expected = KCAL_PER_GRAM.protein * per100g.protein + KCAL_PER_GRAM.carbs * per100g.carbs + KCAL_PER_GRAM.fat * per100g.fat;
+  const diff = Math.abs(per100g.calories - expected);
+  if (diff < PLAUSIBILITY_MIN_DIFF_KCAL) return null;
+  if (expected > 0 && diff / expected <= PLAUSIBILITY_TOLERANCE) return null;
+  return `Die Kalorien passen nicht ganz zu den Makros (daraus ergeben sich etwa ${Math.round(expected)} kcal). Bitte prüfen.`;
+}
+
 export function sumNutrients(items: Nutrients[]): Nutrients {
   const total = items.reduce(
     (acc, n) => ({

@@ -17,7 +17,7 @@ Reihenfolge ungefähr so, wie die Schritte aufeinander aufbauen.
   - Plattform: iOS
   - Name: **HALABI** <!-- TODO: Prüfen, ob der Name im App Store noch frei ist und keine Markenrechte Dritter verletzt (z. B. Recherche im DPMA-Register und EUIPO). -->
   - Primäre Sprache: Deutsch
-  - Bundle-ID: **de.abuelkheir.halabi** (muss zuerst unter *Certificates, Identifiers & Profiles* existieren – `eas build` legt sie beim ersten Build an)
+  - Bundle-ID: **com.abdelkarim.allahumadiaet** (muss zuerst unter *Certificates, Identifiers & Profiles* existieren – `eas build` legt sie beim ersten Build an)
   - SKU: frei wählbar, z. B. `halabi-ios`
   - Benutzerzugriff: Vollzugriff
 - [ ] Unter *App-Informationen → Allgemeine Informationen* die **Apple-ID** (nur Ziffern) ablesen und in `eas.json` bei `submit.production.ios.ascAppId` statt `TODO_ASC_APP_ID` eintragen.
@@ -51,13 +51,14 @@ Warum „Keine Daten erfasst“ in Frage kommt:
 - Das Privacy Manifest (`app.json` → `ios.privacyManifests`) meldet `NSPrivacyTracking: false` und keine erfassten Datentypen.
 
 **Wichtiger Vorbehalt – Open Food Facts:**
-Beim Scannen gehen der Barcode und die IP-Adresse an die Open-Food-Facts-API, beim Anzeigen von Produktbildern die IP-Adresse an deren Bildserver. Open Food Facts speichert IP-Adressen nach eigener Datenschutzerklärung in Server-Logs (dort angegeben: 3 Jahre, für Sicherheit, technische Analysen und Statistik).
+Beim Scannen gehen der Barcode und die IP-Adresse an die Open-Food-Facts-API, bei der **Online-Suche der eingegebene Suchbegriff** und die IP-Adresse an deren Suchdienst (search.openfoodfacts.org), beim Anzeigen von Produktbildern die IP-Adresse an deren Bildserver. Open Food Facts speichert IP-Adressen nach eigener Datenschutzerklärung in Server-Logs (dort angegeben: 3 Jahre, für Sicherheit, technische Analysen und Statistik).
 
 - Open Food Facts ist eine öffentliche Datenbank, deren Code nicht in der App steckt. Ob Apple sie als „Drittanbieter-Partner“ wertet, ist nicht eindeutig.
 - Für IP-Adressen sagt Apple: je nach Verwendung als *Grobe Position*, *Geräte-ID* oder *Diagnose* angeben.
-- Der Barcode könnte als *Suchverlauf* („Informationen über Suchen in der App“) gelten.
+- **Suchbegriffe** fallen ziemlich direkt unter Apples Datentyp *Suchverlauf* („Informationen über Suchen in der App“). Seit es die Online-Suche gibt, ist „Keine Daten erfasst“ deshalb schwerer zu begründen als vorher, als nur Barcodes übertragen wurden.
+- Die lokale Suche, „Zuletzt verwendet“ und „Häufig gegessen“ bleiben auf dem Gerät und sind keine Erfassung.
 
-<!-- TODO: Entscheiden, ob „Keine Daten erfasst“ vertretbar ist. Vorsichtigere Alternative: „Suchverlauf“ – nicht mit der Identität verknüpft, nicht für Tracking, Zweck „App-Funktionalität“. Die Angaben müssen zur Datenschutzerklärung (docs/datenschutz.md) passen. -->
+<!-- TODO: Entscheiden, ob „Keine Daten erfasst“ noch vertretbar ist. Empfohlene, vorsichtigere Angabe: „Suchverlauf“ – nicht mit der Identität verknüpft, nicht für Tracking, Zweck „App-Funktionalität“. Die Angaben müssen zur Datenschutzerklärung (docs/datenschutz.md, Abschnitt 5a) passen. -->
 
 ## 5. Altersfreigabe
 
@@ -99,7 +100,7 @@ Anforderungen laut Apple (Stand siehe oben):
 - **Pflicht:** Screenshots für das **6,5"-Display** (1284 × 2778 px Hochformat), sofern keine 6,9"-Screenshots geliefert werden. Einfacher: direkt **6,9"** liefern (1320 × 2868, 1290 × 2796 oder 1260 × 2736 px) – die kleineren Größen skaliert Apple dann herunter.
 - iPad-Screenshots sind nicht nötig, weil `ios.supportsTablet` auf `false` steht.
 
-Vorschlag für 4–5 Motive: Dashboard mit Kalorienring · Scanner · Eintragen mit Mengeneingabe · Profil mit Tagesziel · Info & Rechtliches (optional).
+Vorschlag für 5–6 Motive: Dashboard mit Kalorienring · Scanner · Eintragen mit Mengeneingabe · Suche mit „Zuletzt verwendet“ · Eintrag bearbeiten · Profil mit Tagesziel.
 <!-- TODO: Screenshots mit Beispieldaten erstellen (z. B. im iOS-Simulator über einen Mac-Dienst oder vom eigenen iPhone). Keine echten persönlichen Daten zeigen. -->
 
 ## 8. Notizen für die App-Prüfung
@@ -115,6 +116,8 @@ HALABI ist ein Kalorien- und Makrotracker nach dem Prinzip „Scannen und eintra
 - Produktdaten werden über die öffentliche Open-Food-Facts-API anhand des Barcodes abgefragt.
 
 Testen ohne Lebensmittel zur Hand:
+
+Variante A – Nummerneingabe:
 Auf dem Startbildschirm „Scannen“ antippen und im Scanner unten „Nummer eintippen“ wählen. Eine der folgenden Barcode-Nummern eingeben:
 
 1. 4000417025005 – Ritter Sport Marzipan
@@ -122,13 +125,20 @@ Auf dem Startbildschirm „Scannen“ antippen und im Scanner unten „Nummer ei
 3. 4001724819806 – Dr. Oetker Ristorante Pizza Mozzarella
 
 Anschließend eine Menge in Gramm eingeben und „Speichern“ antippen.
-Unbekannte Barcodes führen zu einem Formular, in dem Nährwerte einmalig manuell erfasst werden.
+
+Variante B – Suche:
+Auf dem Startbildschirm die Lupe links neben „Scannen“ antippen, z. B. „Spaghetti“ eingeben und „Online suchen“ antippen. Ein Ergebnis auswählen, Menge eingeben, speichern. Ohne Eingabe zeigt die Suche zuletzt verwendete Lebensmittel.
+
+Weitere Funktionen:
+- Unbekannte Barcodes führen zu einem Formular, in dem Nährwerte einmalig manuell erfasst werden.
+- Ein Eintrag auf dem Startbildschirm lässt sich antippen und bearbeiten (Menge, Mahlzeit, Nährwerte).
+- In der Suche kann über „… als eigenes Lebensmittel anlegen“ ein Lebensmittel ohne Barcode angelegt werden.
 
 Die Kamera-Berechtigung wird nur für das Scannen von Barcodes verwendet.
 Daten löschen: Startbildschirm → „Info & Rechtliches“ → „Alle Daten löschen“.
 ```
 
-Die drei Barcodes wurden am 15.09.2026 über die Open-Food-Facts-API mit der App-eigenen Funktion `parseProduct` geprüft; alle lieferten `status: found` mit vollständigen Nährwerten. Open Food Facts wird von Freiwilligen gepflegt – vor dem Einreichen kurz in der App gegenprüfen.
+Die drei Barcodes wurden am 15.09.2026 (zweimal) über die Open-Food-Facts-API mit der App-eigenen Funktion `fetchProduct`/`parseProduct` geprüft; alle lieferten `status: found` mit vollständigen Nährwerten. Open Food Facts wird von Freiwilligen gepflegt – vor dem Einreichen kurz in der App gegenprüfen.
 
 - [ ] Kontaktdaten für die App-Prüfung (Name, Telefon, E-Mail) ausfüllen. Diese sind nur für Apple sichtbar.
 - [ ] Anmeldung erforderlich: **Nein**.
@@ -164,11 +174,17 @@ SCANNEN UND EINTRAGEN
 • Produktdaten aus der offenen Datenbank Open Food Facts
 • Fehlt ein Produkt, trägst du die Nährwerte einmal ein – beim nächsten Scan ist es sofort da, auch ohne Internet
 • Schnellauswahl für Packung, 100 g, Esslöffel und Teelöffel
+• Nährwerte korrigieren, wenn die Angaben nicht zur Verpackung passen
+
+SUCHEN STATT SCANNEN
+• Zuletzt verwendete und häufig gegessene Lebensmittel mit einem Tipp – auch offline
+• Online-Suche in Open Food Facts, wenn kein Barcode zur Hand ist
+• Eigene Lebensmittel ohne Barcode anlegen, z. B. selbst gekochte Gerichte
 
 DEIN TAG AUF EINEN BLICK
 • Kalorienring mit verbleibenden Kalorien
 • Balken für Protein, Kohlenhydrate und Fett
-• Einträge nach Frühstück, Mittagessen, Abendessen und Snacks
+• Einträge nach Frühstück, Mittagessen, Abendessen und Snacks – antippen zum Bearbeiten
 
 DEIN TAGESZIEL
 • Berechnung aus Alter, Größe, Gewicht, Zielgewicht und Aktivität
@@ -189,7 +205,7 @@ Produktdaten und -bilder: Open Food Facts (ODbL / CC BY-SA).
 
 ## 10. Build und Einreichen
 
-- [ ] `eas login`, `eas init` (siehe README, Abschnitt „Veröffentlichen“)
+- [ ] `eas login`, `eas init` (siehe README, Abschnitt „Veröffentlichen“; `eas.json` liegt schon vor, `eas build:configure` ist daher nicht nötig)
 - [ ] `eas build --platform ios --profile production`
 - [ ] `eas submit --platform ios --profile production`
 - [ ] Build in App Store Connect der Version zuordnen, Exportkontrolle ist über `usesNonExemptEncryption: false` bereits beantwortet.

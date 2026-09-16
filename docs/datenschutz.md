@@ -24,15 +24,17 @@ E-Mail: [abdel.abu99@gmail.com](mailto:abdel.abu99@gmail.com)
 
 - HALABI hat **kein Konto, keine Werbung, kein Tracking und keine eigenen Analyse-Werkzeuge**.
 - Alles, was du in der App eingibst – Profil, Gewicht, Tagebuch, selbst angelegte Produkte –, wird **nur auf deinem Gerät** gespeichert. Ich als Anbieter habe darauf keinen Zugriff.
-- Nur wenn du ein Produkt scannst oder eine Barcode-Nummer eingibst, fragt die App die Datenbank **Open Food Facts** ab. Dabei werden der Barcode und technisch bedingt deine IP-Adresse übermittelt.
+- Nur wenn du ein Produkt scannst, eine Barcode-Nummer eingibst oder aktiv online suchst, fragt die App die Datenbank **Open Food Facts** ab. Dabei werden der Barcode bzw. dein Suchbegriff und technisch bedingt deine IP-Adresse übermittelt.
 
 ## 3. Speicherung auf deinem Gerät
 
 Die App speichert folgende Angaben in einer lokalen Datenbank auf deinem Gerät:
 
 - Profil: Alter, Geschlecht, Größe, aktuelles Gewicht, Zielgewicht, Aktivitätslevel, berechnetes Kalorienziel und Makroverteilung
-- Tagebuch: gegessene Produkte mit Menge, Mahlzeit, Datum und Uhrzeit
-- Produkte: Name, Marke, Nährwerte und ggf. Bild-Adresse von gescannten oder selbst eingegebenen Produkten
+- Tagebuch: gegessene Produkte mit Menge, Mahlzeit, Datum, Uhrzeit und den Nährwerten zum Zeitpunkt des Eintrags
+- Produkte und eigene Lebensmittel: Name, Marke, Nährwerte, ggf. Bild-Adresse und ob du die Werte selbst korrigiert hast
+
+Die Vorschläge „Zuletzt verwendet“ und „Häufig gegessen“ in der Suche werden aus diesem Tagebuch auf dem Gerät berechnet. Die lokale Suche verlässt dein Gerät nicht.
 
 Diese Daten verlassen dein Gerät nicht durch die App und werden nicht an mich oder Dritte übermittelt. Da Gewicht und Ernährungsangaben Gesundheitsdaten im Sinne von Art. 9 DSGVO sein können, verarbeitet die App sie ausschließlich lokal.
 
@@ -60,7 +62,20 @@ Anbieter der Datenbank ist Open Food Facts, eine Vereinigung nach französischem
 Die Übermittlung erfolgt nur, wenn du aktiv ein Produkt suchst, und ist für diese Funktion erforderlich. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; das berechtigte Interesse liegt darin, dir die gewünschten Produktdaten anzuzeigen.
 <!-- TODO: Rechtsgrundlage (lit. b oder lit. f) und die Rolle von Open Food Facts (eigener Verantwortlicher, kein Auftragsverarbeiter) rechtlich prüfen. Prüfen, ob Open Food Facts Dienstleister außerhalb der EU einsetzt. -->
 
-Gefundene Produktdaten werden anschließend auf deinem Gerät gespeichert, damit spätere Scans ohne erneute Abfrage funktionieren.
+Wenn du ein gefundenes Produkt einträgst oder seine Werte korrigierst, werden die Produktdaten auf deinem Gerät gespeichert, damit spätere Scans ohne erneute Abfrage funktionieren.
+
+## 5a. Online-Suche bei Open Food Facts
+
+Die Textsuche durchsucht zuerst nur die Lebensmittel auf deinem Gerät. Erst wenn du ausdrücklich „Online suchen“ antippst oder die Suche mit der Eingabetaste abschickst, sendet die App eine Anfrage an den Suchdienst von Open Food Facts (search.openfoodfacts.org). Übermittelt werden:
+
+- dein Suchbegriff sowie die Information, dass bevorzugt Produkte aus Deutschland gesucht werden,
+- die gewünschte Ergebnisseite („Mehr laden“),
+- deine IP-Adresse und die technische Kennung der App wie in Abschnitt 5.
+
+Suchbegriffe können Rückschlüsse auf deine Ernährung zulassen. Gib daher keine Namen oder anderen persönlichen Angaben in das Suchfeld ein, wenn du online suchst. Suchergebnisse werden nicht dauerhaft gespeichert; erst wenn du ein Produkt auswählst und einträgst, landet es in der lokalen Datenbank. Anbieter, Rechtsgrundlage und Speicherdauer bei Open Food Facts entsprechen Abschnitt 5.
+<!-- TODO: Prüfen, ob Open Food Facts für den Suchdienst Search-a-licious eigene Log- oder Speicherfristen nennt, und ggf. ergänzen. -->
+
+Bei „Eigenes Lebensmittel anlegen“ wird nichts übermittelt.
 
 ## 6. Produktbilder
 
@@ -68,7 +83,7 @@ Hat ein Produkt bei Open Food Facts ein Bild, lädt die App es von den Servern v
 
 ## 7. Kein Tracking, keine Weitergabe
 
-Die App enthält keine Werbung, keine Analyse- oder Tracking-Werkzeuge und kein Crash-Reporting. Ich gebe keine Daten an Dritte weiter und verkaufe keine Daten. Ausnahmen sind nur die in den Abschnitten 4 bis 6 beschriebenen Übermittlungen, die technisch für das Scannen und die Produktsuche nötig sind.
+Die App enthält keine Werbung, keine Analyse- oder Tracking-Werkzeuge und kein Crash-Reporting. Ich gebe keine Daten an Dritte weiter und verkaufe keine Daten. Ausnahmen sind nur die in den Abschnitten 4 bis 6 beschriebenen Übermittlungen, die technisch für das Scannen, die Produktabfrage und die Online-Suche nötig sind.
 
 ## 8. Geräte-Backups
 
