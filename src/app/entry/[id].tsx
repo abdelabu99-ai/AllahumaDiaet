@@ -57,13 +57,16 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
   const [editingNutrients, setEditingNutrients] = useState(false);
   const [applyToFood, setApplyToFood] = useState(false);
   const [saving, setSaving] = useState(false);
-  // Hoehe der festen Buttonleiste und der Tastatur: Beides braucht unten Platz, sonst laesst sich
-  // der Inhalt bei offener Tastatur nicht bis zum Ende scrollen.
+  // Hoehe der festen Buttonleiste (fuer die Berechnung unten) und der Tastatur.
   const [footerHeight, setFooterHeight] = useState(0);
   const keyboardHeight = useKeyboardHeight();
+  // Die Buttonleiste steht unter der Liste, verdeckt sie also nicht. Nur der Teil der Tastatur,
+  // der ueber die Leiste hinausragt, liegt ueber dem Inhalt und braucht unten Platz.
+  const hiddenByKeyboard = Math.max(keyboardHeight - footerHeight, 0);
   const scrollRef = useRef<ScrollView>(null);
-  // Position des Naehrwert-Bereichs im Inhalt, um gezielt dorthin zu scrollen.
+  // Position des Naehrwert-Bereichs im Inhalt und aktuelle Scroll-Position, um gezielt dorthin zu scrollen.
   const panelY = useRef(0);
+  const scrollY = useRef(0);
 
   const grams = parseDecimal(amount);
   const validGrams = validPortionGrams(grams);
@@ -98,7 +101,12 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
   const scrollToNutrients = () => {
     // Nicht ans Ende springen (sonst steht unten nur leerer Platz), sondern den Bereich
     // knapp unter die Kopfzeile holen. Kurze Verzoegerung, bis Layout und Tastatur stehen.
-    setTimeout(() => scrollRef.current?.scrollTo({ y: Math.max(panelY.current - spacing.sm, 0), animated: true }), 150);
+    setTimeout(() => {
+      const target = Math.max(panelY.current - spacing.sm, 0);
+      // Nur scrollen, wenn der Bereich nicht ohnehin schon oben steht: sonst springt es bei jedem Feld.
+      if (Math.abs(scrollY.current - target) < 24) return;
+      scrollRef.current?.scrollTo({ y: target, animated: true });
+    }, 150);
   };
 
   const confirmDelete = () => {
@@ -140,9 +148,13 @@ function EntryEditor({ entry }: { entry: LogEntryDetail }) {
       <ScrollView
         ref={scrollRef}
         style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: Math.max(footerHeight, keyboardHeight) + spacing.md }]}
+        contentContainerStyle={[styles.content, { paddingBottom: hiddenByKeyboard + spacing.md }]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        scrollEventThrottle={32}
+        onScroll={(event) => {
+          scrollY.current = event.nativeEvent.contentOffset.y;
+        }}
       >
         <View style={styles.amountRow}>
           <TextInput
