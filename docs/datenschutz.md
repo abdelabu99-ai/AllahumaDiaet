@@ -41,7 +41,7 @@ Diese Daten verlassen dein Gerät nicht durch die App und werden nicht an mich o
 **Speicherdauer:** Die Daten bleiben so lange auf deinem Gerät, bis du sie selbst löschst – über „Info & Rechtliches → Alle Daten löschen“ oder durch Deinstallieren der App. Eine automatische Löschfrist gibt es nicht, weil ein Tagebuch nur dann nützlich ist, wenn es dauerhaft erhalten bleibt.
 
 Das Speichern auf deinem Gerät ist für die von dir gewünschte Funktion unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).
-<!-- TODO: Rechtsgrundlage prüfen lassen. Da der Anbieter keinen Zugriff hat, ist fraglich, ob überhaupt eine Verarbeitung durch den Verantwortlichen im Sinne der DSGVO vorliegt. -->
+<!-- TODO (rechtliche Prüfung): Da der Anbieter keinen Zugriff hat, ist fraglich, ob überhaupt eine Verarbeitung durch den Verantwortlichen im Sinne der DSGVO vorliegt. Die Erklärung beschreibt die lokale Speicherung deshalb vorsorglich, ohne eine DSGVO-Rechtsgrundlage für sich zu behaupten. -->
 
 ## 4. Kamera
 
@@ -63,7 +63,8 @@ Wenn du einen Barcode scannst oder eintippst und das Produkt noch nicht auf dein
 Anbieter der Datenbank ist Open Food Facts, eine Vereinigung nach französischem Recht mit Sitz in 21 rue des Iles, 94100 Saint-Maur-des-Fossés, Frankreich. Open Food Facts verarbeitet diese Daten in eigener Verantwortung; Details findest du in der [Datenschutzerklärung von Open Food Facts](https://world.openfoodfacts.org/privacy). Nach deren Angaben werden IP-Adressen in Server-Logs für Sicherheit, technische Analysen und Statistik gespeichert.
 
 Die Übermittlung erfolgt nur, wenn du aktiv ein Produkt suchst, und ist für diese Funktion erforderlich. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; das berechtigte Interesse liegt darin, dir die gewünschten Produktdaten anzuzeigen.
-<!-- TODO: Rechtsgrundlage (lit. b oder lit. f) und die Rolle von Open Food Facts (eigener Verantwortlicher, kein Auftragsverarbeiter) rechtlich prüfen. Prüfen, ob Open Food Facts Dienstleister außerhalb der EU einsetzt. -->
+Open Food Facts handelt dabei als eigener Verantwortlicher und nicht als Auftragsverarbeiter für mich: Die Vereinigung entscheidet selbst über Zwecke und Mittel und hat eine eigene Datenschutzerklärung. Als Dienstleister nennt Open Food Facts dort nur Mailjet, Brevo und Donorbox für E-Mail, Newsletter und Spenden; diese Funktionen nutzt Halabi nicht. Dienstleister außerhalb der EU für die Produktabfrage werden dort nicht genannt.
+<!-- TODO (rechtliche Prüfung): Ob statt Art. 6 Abs. 1 lit. f zusätzlich lit. b greift (kostenloser Vertrag über digitale Inhalte, § 327 BGB), ist Auslegungsfrage. Die Angabe „lit. f“ ist die vorsichtigere Variante, weil sie dir ein Widerspruchsrecht nach Art. 21 DSGVO einräumt. -->
 
 Wenn du ein gefundenes Produkt einträgst oder seine Werte korrigierst, werden die Produktdaten auf deinem Gerät gespeichert, damit spätere Scans ohne erneute Abfrage funktionieren.
 
@@ -76,7 +77,7 @@ Die Textsuche durchsucht zuerst nur die Lebensmittel auf deinem Gerät. Erst wen
 - deine IP-Adresse und die technische Kennung der App wie in Abschnitt 5.
 
 Suchbegriffe können Rückschlüsse auf deine Ernährung zulassen. Gib daher keine Namen oder anderen persönlichen Angaben in das Suchfeld ein, wenn du online suchst. Suchergebnisse werden nicht dauerhaft gespeichert; erst wenn du ein Produkt auswählst und einträgst, landet es in der lokalen Datenbank. Anbieter, Rechtsgrundlage und Speicherdauer bei Open Food Facts entsprechen Abschnitt 5.
-<!-- TODO: Prüfen, ob Open Food Facts für den Suchdienst Search-a-licious eigene Log- oder Speicherfristen nennt, und ggf. ergänzen. -->
+Für den Suchdienst nennt Open Food Facts keine eigenen Fristen; es gilt die allgemeine Angabe aus deren Datenschutzerklärung, nach der IP-Adressen in Server-Logs drei Jahre gespeichert werden (geprüft am 17.09.2026).
 
 Bei „Eigenes Lebensmittel anlegen“ wird nichts übermittelt.
 

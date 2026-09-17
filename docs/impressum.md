@@ -14,7 +14,7 @@ Nehringstraße 23<br>
 Deutschland
 
 <!-- TODO (rechtliche Prüfung): § 5 DDG gilt für „geschäftsmäßige, in der Regel gegen Entgelt angebotene digitale Dienste“. Die App ist kostenlos, werbefrei und ohne Einnahmen, was dagegen spricht; „geschäftsmäßig“ wird jedoch weit ausgelegt und meint eine nachhaltige Tätigkeit auch ohne Gewinnerzielungsabsicht. Entscheiden lassen, ob diese Seite nötig ist. Die Angaben zum Verantwortlichen in der Datenschutzerklärung sind davon unabhängig Pflicht (Art. 13 Abs. 1 lit. a DSGVO). -->
-<!-- TODO: Prüfen, ob unter dieser Anschrift eine ladungsfähige Zustellung möglich ist (keine reine Postfach-/c/o-Adresse ohne Zustellvollmacht). -->
+<!-- Angabe von dir: Nehringstraße 23, 14059 Berlin – eine Straßenanschrift, unter der Post zugestellt werden kann. Ein reines Postfach oder eine c/o-Adresse ohne Zustellvollmacht würde für § 5 DDG nicht genügen. Hinweis: Für den Händlerstatus im App Store (Digital Services Act) akzeptiert Apple dagegen auch ein Postfach – siehe docs/app-store-connect.md. -->
 
 ## Kontakt
 
