@@ -1,10 +1,10 @@
 ---
-title: Support – Halabi
+title: Support – Hachibu
 ---
 
 # Support
 
-Du hast eine Frage, einen Fehler gefunden oder einen Wunsch für Halabi? Schreib eine E-Mail an
+Du hast eine Frage, einen Fehler gefunden oder einen Wunsch für Hachibu? Schreib eine E-Mail an
 **[abdel.abu99@gmail.com](mailto:abdel.abu99@gmail.com)**.
 
 Hilfreich sind dabei die App-Version (zu finden in der App unter *Info & Rechtliches*), dein Gerät und – bei Problemen mit einem Produkt – der Barcode.
@@ -27,7 +27,7 @@ Beim Eintragen auf *Nährwerte korrigieren* tippen. Die Korrektur gilt ab dann f
 In der App unter *Info & Rechtliches → Alle Daten löschen*. Alternativ die App deinstallieren.
 
 **Wie wird mein Kalorienziel berechnet?**
-Halabi berechnet den Grundumsatz nach der Formel von Mifflin-St. Jeor und multipliziert ihn mit dem PAL-Faktor deines Aktivitätslevels nach den Referenzwerten der Deutschen Gesellschaft für Ernährung. Beim Abnehmen werden 500 kcal abgezogen, beim Zunehmen 300 kcal addiert; unter deinen Grundumsatz geht das Ziel nie. Makronährstoffe werden mit 4 kcal je Gramm Protein und Kohlenhydrate und 9 kcal je Gramm Fett umgerechnet. Den Rechenweg und alle Quellen findest du in der App unter *Info & Rechtliches → Berechnung & Quellen*. Die Werte sind Richtwerte für gesunde Erwachsene und ersetzen keine ärztliche oder ernährungsfachliche Beratung.
+Hachibu berechnet den Grundumsatz nach der Formel von Mifflin-St. Jeor und multipliziert ihn mit dem PAL-Faktor deines Aktivitätslevels nach den Referenzwerten der Deutschen Gesellschaft für Ernährung. Beim Abnehmen werden 500 kcal abgezogen, beim Zunehmen 300 kcal addiert; unter deinen Grundumsatz geht das Ziel nie. Makronährstoffe werden mit 4 kcal je Gramm Protein und Kohlenhydrate und 9 kcal je Gramm Fett umgerechnet. Den Rechenweg und alle Quellen findest du in der App unter *Info & Rechtliches → Berechnung & Quellen*. Die Werte sind Richtwerte für gesunde Erwachsene und ersetzen keine ärztliche oder ernährungsfachliche Beratung.
 
 **Werden meine Daten gesichert oder synchronisiert?**
 Nein, es gibt kein Konto und keine Cloud. Deine Daten können aber in den Geräte-Backups deines Betriebssystems (z. B. iCloud-Backup) enthalten sein.

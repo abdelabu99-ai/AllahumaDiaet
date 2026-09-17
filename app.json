@@ -1,17 +1,20 @@
 {
   "expo": {
-    "name": "Halabi",
-    "slug": "halabi",
-    "scheme": "halabi",
+    "name": "Hachibu",
+    "slug": "hachibu",
+    "scheme": "hachibu",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "com.abdelkarim.allahumadiaet",
+      "bundleIdentifier": "com.abdelkarim.hachibu",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       },
       "privacyManifests": {
         "NSPrivacyTracking": false,
@@ -38,7 +41,7 @@
       }
     },
     "android": {
-      "package": "com.abdelkarim.allahumadiaet",
+      "package": "com.abdelkarim.hachibu",
       "adaptiveIcon": {
         "backgroundColor": "#F7F6F3",
         "foregroundImage": "./assets/android-icon-foreground.png",

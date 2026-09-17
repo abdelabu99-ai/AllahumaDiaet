@@ -3,7 +3,7 @@
 //
 // Quellen:
 //   assets/source/icon.png     – quadratisches „H.“-Zeichen auf cremefarbenem Grund
-//   assets/source/wordmark.png – Schriftzug „Halabi.“ auf transparentem Grund
+//   assets/source/wordmark.png – Schriftzug „Hachibu.“ auf transparentem Grund
 
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
