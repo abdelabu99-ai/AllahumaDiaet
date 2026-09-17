@@ -10,6 +10,7 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { deleteAllData } from '../db/repository';
 import { IMPRINT, LEGAL_URLS } from '../legal/imprint';
 import licenses from '../legal/licenses.json';
+import { CALCULATION_SOURCES, CALCULATION_STEPS, MEDICAL_DISCLAIMER } from '../legal/sources';
 import { colors, radius, spacing } from '../theme';
 
 async function openLink(url: string) {
@@ -114,6 +115,25 @@ export default function About() {
         </Text>
       </Section>
 
+      <Section title="Berechnung & Quellen">
+        <Text style={styles.body}>So entsteht dein Tagesziel:</Text>
+        {CALCULATION_STEPS.map((step, index) => (
+          <Text key={step} style={[styles.body, styles.lineSpacing]}>
+            {index + 1}. {step}
+          </Text>
+        ))}
+        <Text style={[styles.sourcesLabel, styles.lineSpacing]}>Verwendete Quellen</Text>
+        {CALCULATION_SOURCES.map((source) => (
+          <View key={source.url} style={styles.source}>
+            <Text style={styles.sourceTitle}>{source.title}</Text>
+            <Text style={styles.sourceDetail}>{source.detail}</Text>
+            <Text style={styles.link} suppressHighlighting onPress={() => openLink(source.url)} accessibilityRole="link">
+              Quelle öffnen
+            </Text>
+          </View>
+        ))}
+      </Section>
+
       <Section title="Open-Source-Lizenzen">
         <Text style={styles.body}>
           {APP_NAME} verwendet {licenses.length} Open-Source-Pakete. Die vollständigen Lizenztexte sind in den jeweiligen Paketen
@@ -142,7 +162,7 @@ export default function About() {
       </Section>
 
       <Section title="Hinweis">
-        <Text style={styles.body}>Die Berechnungen sind Richtwerte und ersetzen keine ärztliche Beratung.</Text>
+        <Text style={styles.body}>{MEDICAL_DISCLAIMER}</Text>
       </Section>
 
       <Section title="Daten">
@@ -175,6 +195,10 @@ const styles = StyleSheet.create({
   body: { fontSize: 15, color: colors.text, lineHeight: 22 },
   lineSpacing: { marginTop: spacing.sm },
   link: { color: colors.primary, fontWeight: '600' },
+  sourcesLabel: { fontSize: 15, fontWeight: '700', color: colors.text },
+  source: { marginTop: spacing.sm },
+  sourceTitle: { fontSize: 14, fontWeight: '600', color: colors.text },
+  sourceDetail: { fontSize: 13, color: colors.textMuted, lineHeight: 19, marginTop: 2 },
   buttonSpacing: { marginTop: spacing.md },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: spacing.sm, alignSelf: 'flex-start', paddingVertical: 4 },
   licenseRow: {
