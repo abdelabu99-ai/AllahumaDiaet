@@ -1,10 +1,10 @@
 ---
-title: Support – HALABI
+title: Support – Halabi
 ---
 
 # Support
 
-Du hast eine Frage, einen Fehler gefunden oder einen Wunsch für HALABI? Schreib eine E-Mail an
+Du hast eine Frage, einen Fehler gefunden oder einen Wunsch für Halabi? Schreib eine E-Mail an
 **[abdel.abu99@gmail.com](mailto:abdel.abu99@gmail.com)**.
 
 Hilfreich sind dabei die App-Version (zu finden in der App unter *Info & Rechtliches*), dein Gerät und – bei Problemen mit einem Produkt – der Barcode.

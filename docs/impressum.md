@@ -1,5 +1,5 @@
 ---
-title: Impressum – HALABI
+title: Impressum – Halabi
 ---
 
 # Impressum
