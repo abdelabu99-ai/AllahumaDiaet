@@ -1,5 +1,5 @@
 ---
-title: Impressum – Halabi
+title: Impressum – Hachibu
 ---
 
 # Impressum

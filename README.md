@@ -1,4 +1,4 @@
-# Halabi
+# Hachibu
 
 Kalorientracker-App für iPhone und Android nach dem Prinzip „Scan & Go“: öffnen, Barcode scannen, Menge eintippen, fertig.
 
@@ -25,7 +25,7 @@ Kalorientracker-App für iPhone und Android nach dem Prinzip „Scan & Go“: ö
 
 ## Marke
 
-Die Vorlagen liegen in `assets/source/`: `icon.png` (Zeichen „H.“ auf Creme `#F7F6F3`) und `wordmark.png` (Schriftzug „Halabi.“, transparent).
+Die Vorlagen liegen in `assets/source/`: `icon.png` (Zeichen „H.“ auf Creme `#F7F6F3`) und `wordmark.png` (Schriftzug „Hachibu.“, transparent).
 `npm run icons` erzeugt daraus alle App-Icons und das Startbild und prüft Größe, Farbmodus, Alphakanal und die Android-Safe-Zone.
 Neue Vorlagen einfach dort ersetzen und das Skript erneut ausführen.
 

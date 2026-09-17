@@ -1,4 +1,4 @@
-# App Store Connect – Checkliste für Halabi
+# App Store Connect – Checkliste für Hachibu
 
 > **Arbeitsdokument, keine Rechtsberatung.** Wird nicht über GitHub Pages veröffentlicht (`_config.yml` → `exclude`).
 > Alle offenen Punkte sind mit TODO markiert. Stand der Apple-Vorgaben: 15.09.2026 – vor dem Einreichen in App Store Connect gegenprüfen.
@@ -9,7 +9,7 @@ Reihenfolge ungefähr so, wie die Schritte aufeinander aufbauen.
 
 - [x] Mitgliedschaft im [Apple Developer Program](https://developer.apple.com/programs/) ist bezahlt (deine Angabe, 17.09.2026).
 - [ ] Kontotyp im [Developer-Portal](https://developer.apple.com/account) unter *Membership details* nachsehen:
-  - **Einzelperson (Individual):** Anbietername im App Store ist dein eigener Name, also Karim Abu Elkheir. So ist Halabi geplant.
+  - **Einzelperson (Individual):** Anbietername im App Store ist dein eigener Name, also Karim Abu Elkheir. So ist Hachibu geplant.
   - **Organisation:** nur mit eingetragener Rechtsform und D-U-N-S-Nummer möglich. Ein Wechsel ist später nur über den Apple-Support möglich, deshalb jetzt bewusst entscheiden.
 - [ ] Zwei-Faktor-Authentifizierung für die Apple-ID aktiv.
 
@@ -17,10 +17,10 @@ Reihenfolge ungefähr so, wie die Schritte aufeinander aufbauen.
 
 - [ ] *Apps → + → Neue App*
   - Plattform: iOS
-  - Name (App-Store-Name, max. 30 Zeichen): **Halabi Kalorientracker** – „Halabi“ allein ist belegt, siehe *2a. Namensprüfung*. Der Name auf dem Homescreen bleibt „Halabi“ (`app.json` → `name`).
+  - Name (App-Store-Name, max. 30 Zeichen): **Hachibu** – geprüft und frei, siehe *2a. Namensprüfung*. Derselbe Name steht auf dem Homescreen (`app.json` → `name`).
   - Primäre Sprache: Deutsch
-  - Bundle-ID: **com.abdelkarim.allahumadiaet** (`app.json` → `ios.bundleIdentifier`; muss zuerst unter *Certificates, Identifiers & Profiles* existieren – `eas build` legt sie beim ersten Build an). **Nach dem ersten Upload nicht mehr änderbar**, siehe *2b. Bundle-ID*.
-  - SKU: frei wählbar, z. B. `halabi-ios`
+  - Bundle-ID: **com.abdelkarim.hachibu** (`app.json` → `ios.bundleIdentifier`; muss zuerst unter *Certificates, Identifiers & Profiles* existieren – `eas build` legt sie beim ersten Build an). **Nach dem ersten Upload nicht mehr änderbar**, siehe *2b. Bundle-ID*.
+  - SKU: frei wählbar, z. B. `hachibu-ios`
   - Benutzerzugriff: Vollzugriff
 - [ ] Unter *App-Informationen → Allgemeine Informationen* die **Apple-ID** (nur Ziffern) ablesen und in `eas.json` bei `submit.production.ios.ascAppId` statt `TODO_ASC_APP_ID` eintragen.
 - [ ] Kategorie: **Gesundheit & Fitness** (primär). Sekundär optional, z. B. *Essen & Trinken*.
@@ -29,19 +29,16 @@ Reihenfolge ungefähr so, wie die Schritte aufeinander aufbauen.
 ## 2a. Namensprüfung (Stand 17.09.2026)
 
 - App-Store-Namen sind weltweit eindeutig. Ist ein Name vergeben, lässt App Store Connect ihn nicht mehr reservieren; Groß- und Kleinschreibung macht dabei keinen Unterschied.
-- Geprüft über die öffentliche Suchschnittstelle von Apple (`https://itunes.apple.com/search?term=halabi&entity=software`, Storefronts Deutschland und USA): Es gibt bereits eine App mit dem exakten Namen **„Halabi“** – Anbieter Yaseen Halabi, Kategorie Social Networking, Bundle-ID `com.contactapp.thecontactapp`.
-- **Ergebnis: „Halabi“ allein ist als App-Store-Name nicht verfügbar.** Die Marke bleibt trotzdem nutzbar, der Store-Name braucht nur einen Zusatz.
-- Empfehlung: `Halabi Kalorientracker` (22 Zeichen). Alternativen: `Halabi – Kalorien zählen` (24 Zeichen), `Halabi Kalorien & Makros` (24 Zeichen).
-- Guideline 2.3.7 verbietet Keyword-Stapeln im Namen: ein beschreibendes Wort ist erlaubt, eine Aufzählung von Suchbegriffen nicht. Wörter, die im Namen oder Untertitel stehen, müssen nicht noch einmal in die Keywords.
-- Der Anzeigename auf dem Gerät darf kürzer sein, muss aber erkennbar zum Store-Namen passen (Guideline 2.3.8). „Halabi“ als Anfang von „Halabi Kalorientracker“ passt.
-- [ ] Markenrecherche vor dem Anlegen: [DPMAregister](https://register.dpma.de/DPMAregister/marke/experte), [EUIPO eSearch](https://euipo.europa.eu/eSearch/) und [TMview](https://www.tmdn.org/tmview/) nach „Halabi“ in den Klassen 9 (Software) und 42/44 durchsuchen. „Halabi“ ist ein verbreiteter Familienname; eine eingetragene Wortmarke Dritter wäre ein echtes Risiko, weil Apple bei einer Beschwerde die App entfernt. Diese Register lassen sich nur von Hand durchsuchen, und die Bewertung des Ergebnisses ist Rechtsberatung – das musst du selbst oder mit einer Anwaltskanzlei erledigen.
+- Geprüft über die öffentliche Suchschnittstelle von Apple (`https://itunes.apple.com/search?term=hachibu&entity=software`, Storefronts Deutschland und USA): **kein Treffer**. „Hachibu“ ist als App-Store-Name frei.
+- Name: **`Hachibu`** (7 von 30 Zeichen), Untertitel `Kalorien scannen & zählen`. Ein beschreibender Zusatz im Namen ist nicht nötig, weil Apple den Untertitel ohnehin mit indexiert. Guideline 2.3.7 (kein Keyword-Stapeln) ist damit unproblematisch, Guideline 2.3.8 ebenfalls, weil der Name auf dem Gerät identisch ist.
+- Vorgeschichte: Der frühere Arbeitsname „Halabi“ war im App Store schon von einer anderen App belegt (Anbieter Yaseen Halabi, Social Networking). Das war der Anlass für den Wechsel auf Hachibu.
+- [ ] Markenrecherche vor dem Anlegen: [DPMAregister](https://register.dpma.de/DPMAregister/marke/experte), [EUIPO eSearch](https://euipo.europa.eu/eSearch/) und [TMview](https://www.tmdn.org/tmview/) nach „Hachibu“ in Klasse 9 (Software) und 42/44 durchsuchen. Als Fantasiewort ist das Risiko geringer als bei einem Familiennamen, aber die Prüfung bleibt nötig: Bei einer Markenbeschwerde entfernt Apple die App. Die Register lassen sich nur von Hand durchsuchen, und die Bewertung des Ergebnisses ist Rechtsberatung.
 
 ## 2b. Bundle-ID (Entscheidung, die bleibt)
 
 - Die Bundle-ID entsteht beim ersten Build und ist danach **dauerhaft**: Sie lässt sich für eine eingereichte App nicht mehr ändern. Ein anderer Wert bedeutet später eine neue App mit neuer Apple-ID – bestehende Installationen bekommen dann keine Updates. Für Android gilt dasselbe für `android.package` ab der ersten Veröffentlichung.
-- Aktuell steht dort `com.abdelkarim.allahumadiaet`, also der alte Projektname. Nutzer sehen die ID nie; sie taucht nur in Entwicklerwerkzeugen auf.
-- Solange kein Build hochgeladen ist, kostet ein Wechsel nichts.
-- [ ] Entscheiden: `com.abdelkarim.allahumadiaet` behalten oder **vor** dem ersten `eas build` in `app.json` sowohl `ios.bundleIdentifier` als auch `android.package` auf `com.abdelkarim.halabi` ändern. Danach nicht mehr anfassen.
+- [x] **Entschieden am 17.09.2026:** `com.abdelkarim.hachibu`, eingetragen in `app.json` unter `ios.bundleIdentifier` **und** `android.package`. Der alte Wert `com.abdelkarim.allahumadiaet` stammte aus dem früheren Projektnamen und ist ersetzt, solange noch kein Build hochgeladen war.
+- Ab dem ersten `eas build` bleibt dieser Wert unverändert.
 
 ## 3. URLs
 
@@ -114,13 +111,13 @@ Eher **kein** Händler: Hobby-Entwickler ohne Absicht, mit der App Geld zu verdi
 
 - [ ] Angabe im Dashboard machen. Ohne Händlerangabe bietet Apple Apps in den EU-Storefronts nicht an – das gilt unabhängig davon, wie die Antwort ausfällt.
 
-<!-- TODO (Einschätzung durch dich, ggf. mit rechtlicher Beratung): Halabi ist kostenlos, werbefrei, ohne In-App-Käufe und ohne Einnahmen – das spricht gegen Händlerstatus. Apple darf den Status nicht für dich bestimmen. -->
+<!-- TODO (Einschätzung durch dich, ggf. mit rechtlicher Beratung): Hachibu ist kostenlos, werbefrei, ohne In-App-Käufe und ohne Einnahmen – das spricht gegen Händlerstatus. Apple darf den Status nicht für dich bestimmen. -->
 
-## 7. Häufige Ablehnungsgründe und wie Halabi sie abdeckt
+## 7. Häufige Ablehnungsgründe und wie Hachibu sie abdeckt
 
 ### Guideline 4.3(a) – Spam in einer überfüllten Kategorie
 
-Kalorienzähler gibt es hunderte. Apple lehnt Apps ab, die sich von vorhandenen kaum unterscheiden, und besonders Apps aus Baukästen oder Vorlagen. Was Halabi unterscheidet und was deshalb in Beschreibung und Prüfnotizen gehört:
+Kalorienzähler gibt es hunderte. Apple lehnt Apps ab, die sich von vorhandenen kaum unterscheiden, und besonders Apps aus Baukästen oder Vorlagen. Was Hachibu unterscheidet und was deshalb in Beschreibung und Prüfnotizen gehört:
 
 - Kein Konto, keine Anmeldung, kein Abo, keine In-App-Käufe, keine Werbung, kein Tracking – bei den großen Anbietern fast immer anders.
 - Alle Daten liegen in einer lokalen SQLite-Datenbank, es gibt keinen Server des Anbieters.
@@ -161,7 +158,7 @@ Vorschlag für 5–6 Motive: Dashboard mit Kalorienring · Scanner · Eintragen 
 Unter *Versionsinformationen → App Review Information → Notizen* einfügen:
 
 ```text
-Halabi ist ein Kalorien- und Makrotracker nach dem Prinzip „Scannen und eintragen“.
+Hachibu ist ein Kalorien- und Makrotracker nach dem Prinzip „Scannen und eintragen“.
 
 - Kein Login erforderlich, keine Konten, keine In-App-Käufe, keine Werbung.
 - Alle Nutzerdaten werden ausschließlich lokal auf dem Gerät gespeichert (SQLite).
@@ -211,17 +208,17 @@ Die drei Barcodes wurden am 15.09.2026 (zweimal) über die Open-Food-Facts-API m
 
 Ohne Heilversprechen und ohne medizinische Aussagen.
 
-**Name** (max. 30 Zeichen, 22 genutzt): `Halabi Kalorientracker` – „Halabi“ allein ist im App Store belegt, siehe Abschnitt 2a.
+**Name** (max. 30 Zeichen, 7 genutzt): `Hachibu`
 
 **Untertitel** (max. 30 Zeichen, 25 genutzt): `Kalorien scannen & zählen`
 
-**Keywords** (max. 100 Bytes, Umlaute zählen doppelt; 96 Bytes genutzt):
+**Keywords** (max. 100 Bytes, Umlaute zählen doppelt; 95 Bytes genutzt):
 
 ```text
-Kalorienzähler,Makros,Barcode,Scanner,Ernährung,Protein,Nährwerte,Lebensmittel,Diät,Tagebuch
+Kalorienzähler,Makros,Barcode,Scanner,Ernährung,Protein,Nährwerte,Lebensmittel,Diät,Tracker
 ```
 
-Apple sucht auch in Name und Untertitel. „Kalorien“, „Tracker“ und „zählen“ stehen deshalb nicht mehr in den Keywords, dafür sind „Diät“ und „Tagebuch“ neu.
+Apple sucht auch in Name und Untertitel. „Kalorien“, „scannen“ und „zählen“ stehen deshalb nicht in den Keywords – der Untertitel deckt sie ab. Weil der Name selbst kein beschreibendes Wort enthält, steht „Tracker“ hier.
 
 **Werbetext** (optional, max. 170 Zeichen):
 
@@ -232,7 +229,7 @@ Barcode scannen, Menge eintippen, fertig: Kalorien und Makros in Sekunden erfass
 **Beschreibung** (max. 4000 Zeichen):
 
 ```text
-Halabi macht das Erfassen von Kalorien und Makronährstoffen so schnell wie möglich: App öffnen, Barcode scannen, Menge eintippen, speichern. Mehr nicht.
+Hachibu macht das Erfassen von Kalorien und Makronährstoffen so schnell wie möglich: App öffnen, Barcode scannen, Menge eintippen, speichern. Mehr nicht.
 
 SCANNEN UND EINTRAGEN
 • Barcode-Scanner für EAN, UPC und QR-Codes auf Lebensmittelverpackungen

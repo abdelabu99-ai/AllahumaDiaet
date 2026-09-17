@@ -1,5 +1,5 @@
 ---
-title: Datenschutzerklärung – Halabi
+title: Datenschutzerklärung – Hachibu
 ---
 
 # Datenschutzerklärung
@@ -8,7 +8,7 @@ title: Datenschutzerklärung – Halabi
 
 Stand: <!-- TODO: Datum der Veröffentlichung eintragen --> TT.MM.JJJJ
 
-Diese Datenschutzerklärung gilt für die App **Halabi** für iOS und Android sowie für diese Webseite.
+Diese Datenschutzerklärung gilt für die App **Hachibu** für iOS und Android sowie für diese Webseite.
 
 ## 1. Verantwortlicher
 
@@ -22,7 +22,7 @@ Ein Datenschutzbeauftragter ist nicht benannt. Nach Art. 37 DSGVO und § 38 BDSG
 
 ## 2. Das Wichtigste in Kürze
 
-- Halabi hat **kein Konto, keine Werbung, kein Tracking und keine eigenen Analyse-Werkzeuge**.
+- Hachibu hat **kein Konto, keine Werbung, kein Tracking und keine eigenen Analyse-Werkzeuge**.
 - Alles, was du in der App eingibst – Profil, Gewicht, Tagebuch, selbst angelegte Produkte –, wird **nur auf deinem Gerät** gespeichert. Ich als Anbieter habe darauf keinen Zugriff.
 - Nur wenn du ein Produkt scannst, eine Barcode-Nummer eingibst oder aktiv online suchst, fragt die App die Datenbank **Open Food Facts** ab. Dabei werden der Barcode bzw. dein Suchbegriff und technisch bedingt deine IP-Adresse übermittelt.
 
@@ -63,7 +63,7 @@ Wenn du einen Barcode scannst oder eintippst und das Produkt noch nicht auf dein
 Anbieter der Datenbank ist Open Food Facts, eine Vereinigung nach französischem Recht mit Sitz in 21 rue des Iles, 94100 Saint-Maur-des-Fossés, Frankreich. Open Food Facts verarbeitet diese Daten in eigener Verantwortung; Details findest du in der [Datenschutzerklärung von Open Food Facts](https://world.openfoodfacts.org/privacy). Nach deren Angaben werden IP-Adressen in Server-Logs für Sicherheit, technische Analysen und Statistik gespeichert.
 
 Die Übermittlung erfolgt nur, wenn du aktiv ein Produkt suchst, und ist für diese Funktion erforderlich. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; das berechtigte Interesse liegt darin, dir die gewünschten Produktdaten anzuzeigen.
-Open Food Facts handelt dabei als eigener Verantwortlicher und nicht als Auftragsverarbeiter für mich: Die Vereinigung entscheidet selbst über Zwecke und Mittel und hat eine eigene Datenschutzerklärung. Als Dienstleister nennt Open Food Facts dort nur Mailjet, Brevo und Donorbox für E-Mail, Newsletter und Spenden; diese Funktionen nutzt Halabi nicht. Dienstleister außerhalb der EU für die Produktabfrage werden dort nicht genannt.
+Open Food Facts handelt dabei als eigener Verantwortlicher und nicht als Auftragsverarbeiter für mich: Die Vereinigung entscheidet selbst über Zwecke und Mittel und hat eine eigene Datenschutzerklärung. Als Dienstleister nennt Open Food Facts dort nur Mailjet, Brevo und Donorbox für E-Mail, Newsletter und Spenden; diese Funktionen nutzt Hachibu nicht. Dienstleister außerhalb der EU für die Produktabfrage werden dort nicht genannt.
 <!-- TODO (rechtliche Prüfung): Ob statt Art. 6 Abs. 1 lit. f zusätzlich lit. b greift (kostenloser Vertrag über digitale Inhalte, § 327 BGB), ist Auslegungsfrage. Die Angabe „lit. f“ ist die vorsichtigere Variante, weil sie dir ein Widerspruchsrecht nach Art. 21 DSGVO einräumt. -->
 
 Wenn du ein gefundenes Produkt einträgst oder seine Werte korrigierst, werden die Produktdaten auf deinem Gerät gespeichert, damit spätere Scans ohne erneute Abfrage funktionieren.
