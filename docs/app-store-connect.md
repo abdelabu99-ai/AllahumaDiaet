@@ -1,4 +1,4 @@
-# App Store Connect – Checkliste für HALABI
+# App Store Connect – Checkliste für Halabi
 
 > **Arbeitsdokument, keine Rechtsberatung.** Wird nicht über GitHub Pages veröffentlicht (`_config.yml` → `exclude`).
 > Alle offenen Punkte sind mit TODO markiert. Stand der Apple-Vorgaben: 15.09.2026 – vor dem Einreichen in App Store Connect gegenprüfen.
@@ -15,7 +15,7 @@ Reihenfolge ungefähr so, wie die Schritte aufeinander aufbauen.
 
 - [ ] *Apps → + → Neue App*
   - Plattform: iOS
-  - Name: **HALABI** <!-- TODO: Prüfen, ob der Name im App Store noch frei ist und keine Markenrechte Dritter verletzt (z. B. Recherche im DPMA-Register und EUIPO). -->
+  - Name: **Halabi** <!-- TODO: Prüfen, ob der Name im App Store noch frei ist und keine Markenrechte Dritter verletzt (z. B. Recherche im DPMA-Register und EUIPO). -->
   - Primäre Sprache: Deutsch
   - Bundle-ID: **com.abdelkarim.allahumadiaet** (muss zuerst unter *Certificates, Identifiers & Profiles* existieren – `eas build` legt sie beim ersten Build an)
   - SKU: frei wählbar, z. B. `halabi-ios`
@@ -90,7 +90,7 @@ Eher **kein** Händler: Hobby-Entwickler ohne Absicht, mit der App Geld zu verdi
 - **Als Nicht-Händler** werden keine Kontaktdaten veröffentlicht. EU-Kunden wird angezeigt, dass Verbraucherschutzrechte gegenüber dir nicht gelten.
 - Der Status lässt sich pro App ändern: *App-Informationen → App Store Regulations and Permits → Digital Services Act*.
 
-<!-- TODO: Selbst einschätzen (ggf. mit rechtlicher Beratung), ob du Händler bist. HALABI ist kostenlos und werbefrei; Apple kann den Status nicht für dich bestimmen. -->
+<!-- TODO: Selbst einschätzen (ggf. mit rechtlicher Beratung), ob du Händler bist. Halabi ist kostenlos und werbefrei; Apple kann den Status nicht für dich bestimmen. -->
 
 ## 7. Screenshots
 
@@ -108,7 +108,7 @@ Vorschlag für 5–6 Motive: Dashboard mit Kalorienring · Scanner · Eintragen 
 Unter *Versionsinformationen → App Review Information → Notizen* einfügen:
 
 ```text
-HALABI ist ein Kalorien- und Makrotracker nach dem Prinzip „Scannen und eintragen“.
+Halabi ist ein Kalorien- und Makrotracker nach dem Prinzip „Scannen und eintragen“.
 
 - Kein Login erforderlich, keine Konten, keine In-App-Käufe, keine Werbung.
 - Alle Nutzerdaten werden ausschließlich lokal auf dem Gerät gespeichert (SQLite).
@@ -147,7 +147,7 @@ Die drei Barcodes wurden am 15.09.2026 (zweimal) über die Open-Food-Facts-API m
 
 Ohne Heilversprechen und ohne medizinische Aussagen.
 
-**Name** (max. 30 Zeichen): `HALABI`
+**Name** (max. 30 Zeichen): `Halabi`
 
 **Untertitel** (max. 30 Zeichen, 25 genutzt): `Kalorien scannen & zählen`
 
@@ -166,7 +166,7 @@ Barcode scannen, Menge eintippen, fertig: Kalorien und Makros in Sekunden erfass
 **Beschreibung** (max. 4000 Zeichen):
 
 ```text
-HALABI macht das Erfassen von Kalorien und Makronährstoffen so schnell wie möglich: App öffnen, Barcode scannen, Menge eintippen, speichern. Mehr nicht.
+Halabi macht das Erfassen von Kalorien und Makronährstoffen so schnell wie möglich: App öffnen, Barcode scannen, Menge eintippen, speichern. Mehr nicht.
 
 SCANNEN UND EINTRAGEN
 • Barcode-Scanner für EAN, UPC und QR-Codes auf Lebensmittelverpackungen

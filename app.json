@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "HALABI",
+    "name": "Halabi",
     "slug": "halabi",
     "scheme": "halabi",
     "version": "1.0.0",
@@ -40,7 +40,7 @@
     "android": {
       "package": "com.abdelkarim.allahumadiaet",
       "adaptiveIcon": {
-        "backgroundColor": "#16A34A",
+        "backgroundColor": "#F7F6F3",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -62,9 +62,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F5F6F8",
+          "backgroundColor": "#F7F6F3",
           "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
+          "imageWidth": 260,
           "resizeMode": "contain"
         }
       ]

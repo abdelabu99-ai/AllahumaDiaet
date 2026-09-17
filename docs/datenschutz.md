@@ -1,5 +1,5 @@
 ---
-title: Datenschutzerklärung – HALABI
+title: Datenschutzerklärung – Halabi
 ---
 
 # Datenschutzerklärung
@@ -8,7 +8,7 @@ title: Datenschutzerklärung – HALABI
 
 Stand: <!-- TODO: Datum der Veröffentlichung eintragen --> TT.MM.JJJJ
 
-Diese Datenschutzerklärung gilt für die App **HALABI** für iOS und Android sowie für diese Webseite.
+Diese Datenschutzerklärung gilt für die App **Halabi** für iOS und Android sowie für diese Webseite.
 
 ## 1. Verantwortlicher
 
@@ -22,7 +22,7 @@ E-Mail: [abdel.abu99@gmail.com](mailto:abdel.abu99@gmail.com)
 
 ## 2. Das Wichtigste in Kürze
 
-- HALABI hat **kein Konto, keine Werbung, kein Tracking und keine eigenen Analyse-Werkzeuge**.
+- Halabi hat **kein Konto, keine Werbung, kein Tracking und keine eigenen Analyse-Werkzeuge**.
 - Alles, was du in der App eingibst – Profil, Gewicht, Tagebuch, selbst angelegte Produkte –, wird **nur auf deinem Gerät** gespeichert. Ich als Anbieter habe darauf keinen Zugriff.
 - Nur wenn du ein Produkt scannst, eine Barcode-Nummer eingibst oder aktiv online suchst, fragt die App die Datenbank **Open Food Facts** ab. Dabei werden der Barcode bzw. dein Suchbegriff und technisch bedingt deine IP-Adresse übermittelt.
 
